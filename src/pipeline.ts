@@ -370,6 +370,8 @@ async function ingest(run: any, ttlSeconds = 7200): Promise<{ base: string; phot
     a => log(run.id, null, `extractor: ${a}`), 900_000);
   if (extract.code !== 0) throw new Error('content extraction agent failed');
 
+  // Don't rely on the agent alone for images: the browser lists everything the page actually shows.
+  await exec(base, `timeout 120 node ~/.rd/qa.mjs assets ${q(run.url)} > ~/kit/assets-auto.tsv 2>/dev/null`, 150);
   const check = await exec(base, `wc -c < ~/kit/content.md; test -f ~/kit/assets.tsv || touch ~/kit/assets.tsv; python3 -I ~/kit/fetch_assets.py | tail -3`, 300);
   const contentBytes = Number(check.stdout.trim().split('\n')[0] || 0);
   if (contentBytes < 200) throw new Error('could not extract any content from the page');
@@ -486,6 +488,8 @@ async function writeMediaNotes(run: any, base: string): Promise<number> {
     if (kind) line += `, ${kind}`;
     if (n?.description) line += `. ${clip(n.description, 220)}`;
     if (clip(n?.text_in_image, 200)) line += ` Text printed in the image: "${clip(n.text_in_image, 200)}": keep it uncropped and uncovered.`;
+    if (/\/auto\/canvas-\d+\.mp4$/.test(m.path)) line += ' A recording of a live animation on the current site: use it as <video muted loop autoplay playsinline> with the matching canvas-N.png as poster. It is unique to this site; feature it.';
+    else if (/\/auto\/canvas-\d+\.png$/.test(m.path)) line += ' A still of a live canvas on the current site (its logo or an interactive scene).';
     lines.push(line);
   }
   if (!media.length) lines.push('- (no images could be downloaded: build the visuals from type, colour and shapes)');

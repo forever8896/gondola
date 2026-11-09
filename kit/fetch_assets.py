@@ -23,8 +23,15 @@ ROOT = os.path.join(HOME, 'redesign')
 MAX_FILES, MAX_FILE, MAX_TOTAL = 60, 15 * 2**20, 120 * 2**20
 OK_EXT = {'.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif', '.svg', '.mp4', '.webm', '.ico'}
 
-total, n, ok = 0, 0, []
-for line in open(os.path.join(HOME, 'kit', 'assets.tsv'), encoding='utf-8', errors='replace'):
+def lines():
+    # The extraction agent's list first, then everything the browser saw on the page (assets-auto.tsv).
+    for name in ('assets.tsv', 'assets-auto.tsv'):
+        path = os.path.join(HOME, 'kit', name)
+        if os.path.exists(path):
+            yield from open(path, encoding='utf-8', errors='replace')
+
+total, n, ok, seen = 0, 0, [], set()
+for line in lines():
     parts = line.rstrip('\n').split('\t')
     if len(parts) != 2:
         continue
@@ -32,9 +39,18 @@ for line in open(os.path.join(HOME, 'kit', 'assets.tsv'), encoding='utf-8', erro
     norm = posixpath.normpath(local)
     if not norm.startswith('assets/') or '..' in norm.split('/') or posixpath.splitext(norm)[1].lower() not in OK_EXT:
         print('skip path', local); continue
+    if url == 'local':
+        # recorded on the page by qa.mjs (live canvases); already in place
+        if os.path.exists(os.path.join(ROOT, norm)):
+            ok.append(norm)
+        continue
     if not url.startswith(('http://', 'https://')):
         print('skip url', url); continue
     url = original_url(url)
+    key = urllib.parse.urlsplit(url)._replace(query='', fragment='').geturl()
+    if key in seen:
+        continue
+    seen.add(key)
     if n >= MAX_FILES or total >= MAX_TOTAL:
         print('cap reached'); break
     dest = os.path.join(ROOT, norm)

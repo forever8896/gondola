@@ -211,6 +211,39 @@ const SCROLL = `(async () => { ${HELPERS}
   return JSON.stringify([...out.values()].slice(0, 12));
 })()`;
 
+// Every image the page actually shows, at its largest available size: <img> (incl. srcset and lazy ones), CSS
+// backgrounds of sizeable boxes, video posters and sources, and the social preview image.
+const ASSETS = `(async () => {
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  document.querySelectorAll('img[loading=lazy]').forEach(i => { i.loading = 'eager'; });
+  const H = document.documentElement.scrollHeight;
+  for (let y = 0; y < H; y += innerHeight * 0.8) { scrollTo(0, y); await wait(150); }
+  await Promise.race([Promise.all([...document.images].map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; }))), wait(8000)]);
+  const out = new Map();
+  const add = (u, score) => { try { const url = new URL(u, location.href).href; if (/^https?:/.test(url)) out.set(url, Math.max(out.get(url) || 0, score)); } catch {} };
+  for (const i of document.images) {
+    const src = i.currentSrc || i.src; if (!src) continue;
+    const isSvg = /\\.svg(\\?|$)/i.test(src);
+    if (i.naturalWidth >= 120 || isSvg) add(src, (i.naturalWidth || 200) * (i.naturalHeight || 200));
+    if (i.srcset) {
+      const best = i.srcset.split(',').map(x => x.trim().split(/\\s+/)).filter(x => x[0]).sort((a, b) => parseFloat(b[1] || 0) - parseFloat(a[1] || 0))[0];
+      if (best && i.naturalWidth >= 120) add(best[0], (i.naturalWidth || 200) * (i.naturalHeight || 200) + 1);
+    }
+  }
+  for (const v of document.querySelectorAll('video')) {
+    if (v.poster) add(v.poster, (v.videoWidth || 800) * (v.videoHeight || 450));
+    for (const src of [v.currentSrc, v.src, ...[...v.querySelectorAll('source')].map(x => x.src)]) if (src) add(src, 1);
+  }
+  for (const e of document.querySelectorAll('body *')) {
+    const bg = getComputedStyle(e).backgroundImage; if (!bg || bg === 'none') continue;
+    const r = e.getBoundingClientRect(); if (r.width * r.height < 40000) continue;
+    for (const m of bg.matchAll(/url\\(["']?([^"')]+)["']?\\)/g)) add(m[1], r.width * r.height);
+  }
+  const og = document.querySelector('meta[property="og:image"], meta[name="og:image"]')?.content; if (og) add(og, 1200 * 630);
+  scrollTo(0, 0);
+  return JSON.stringify([...out.entries()].sort((a, b) => b[1] - a[1]).slice(0, 40).map(x => x[0]));
+})()`;
+
 const PROFILE = `(async () => { ${HELPERS}
   await document.fonts.ready;
   const count = new Map(); const add = (k, w) => count.set(k, (count.get(k) || 0) + w);
@@ -236,6 +269,63 @@ const PROFILE = `(async () => { ${HELPERS}
   });
 })()`;
 
+// Live <canvas> elements (WebAssembly or WebGL scenes, animated logos) have no file behind them: record them.
+// Each sizeable canvas becomes canvas-N.png (first frame) and, when it moves and ffmpeg exists, canvas-N.mp4 (3 s loop).
+async function captureCanvases(outDir) {
+  const fs = await import('node:fs'), { execFileSync } = await import('node:child_process'), crypto = await import('node:crypto');
+  fs.mkdirSync(outDir, { recursive: true });
+  const t = await (await fetch(`http://127.0.0.1:${PORT}/json/new?about:blank`, { method: 'PUT' })).json();
+  const ws = new WebSocket(t.webSocketDebuggerUrl);
+  await new Promise(r => (ws.onopen = r));
+  let id = 0, onLoad = () => {};
+  const pending = new Map();
+  ws.onmessage = ev => { const m = JSON.parse(ev.data); if (m.id && pending.has(m.id)) { pending.get(m.id)(m); pending.delete(m.id); } if (m.method === 'Page.loadEventFired') onLoad(); };
+  const send = (method, params = {}) => new Promise(r => { const i = ++id; pending.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
+  const evaluate = async expr => JSON.parse((await send('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true })).result?.result?.value ?? 'null');
+  await send('Page.enable');
+  await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+  const loaded = new Promise(r => (onLoad = r));
+  await send('Page.navigate', { url });
+  await Promise.race([loaded, sleep(15000)]);
+  await sleep(2500);
+  // Sticky and fixed bars would sit on top of a canvas while we record it: hide them.
+  await evaluate(`([...document.querySelectorAll('body *')].forEach(e => { if (/sticky|fixed/.test(getComputedStyle(e).position) && !e.querySelector('canvas')) e.style.visibility = 'hidden'; }), 'null')`);
+  const list = await evaluate(`JSON.stringify([...document.querySelectorAll('canvas')].map((c, i) => { const r = c.getBoundingClientRect();
+    return { i, area: r.width * r.height, top: r.top + scrollY }; }).filter(c => c.area >= 60000).sort((a, b) => b.area - a.area).slice(0, 4))`) ?? [];
+  const lines = [];
+  let hasFfmpeg = true; try { execFileSync('ffmpeg', ['-version'], { stdio: 'ignore' }); } catch { hasFfmpeg = false; }
+  for (const [k, c] of list.entries()) {
+    await evaluate(`(scrollTo(0, Math.max(0, ${c.top} - 120)), 'null')`);
+    await sleep(700);
+    const r = await evaluate(`JSON.stringify((r => ({ x: r.left, y: r.top, w: r.width, h: r.height }))(document.querySelectorAll('canvas')[${c.i}].getBoundingClientRect()))`);
+    if (!r || r.w < 10 || r.h < 10) continue;
+    const dir = `/tmp/gondola-canvas-${process.pid}-${k}`; fs.mkdirSync(dir, { recursive: true });
+    const hashes = new Set();
+    for (let f = 0; f < 30; f++) {
+      const shot = await send('Page.captureScreenshot', { format: 'png', clip: { x: r.x, y: r.y, width: r.w, height: r.h, scale: 1 } });
+      const buf = Buffer.from(shot.result.data, 'base64');
+      hashes.add(crypto.createHash('md5').update(buf).digest('hex'));
+      fs.writeFileSync(`${dir}/${String(f).padStart(2, '0')}.png`, buf);
+      await sleep(100);
+    }
+    // A blank canvas compresses to almost nothing: skip it.
+    if (fs.statSync(`${dir}/00.png`).size < 4000) { fs.rmSync(dir, { recursive: true, force: true }); continue; }
+    const name = `canvas-${lines.filter(l => l.endsWith('.png\tlocal')).length + 1}`;
+    fs.copyFileSync(`${dir}/00.png`, `${outDir}/${name}.png`);
+    lines.push(`assets/auto/${name}.png\tlocal`);
+    if (hasFfmpeg && hashes.size > 3) {
+      try {
+        execFileSync('ffmpeg', ['-v', 'error', '-y', '-framerate', '10', '-i', `${dir}/%02d.png`, '-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2:flags=neighbor',
+          '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', `${outDir}/${name}.mp4`], { stdio: 'ignore' });
+        lines.push(`assets/auto/${name}.mp4\tlocal`);
+      } catch {}
+    }
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+  ws.close();
+  return lines;
+}
+
 try {
   if (mode === 'check') {
     const d = await inspect(1440, 900, CHECK), m = await inspect(390, 844, CHECK);
@@ -245,6 +335,20 @@ try {
   } else if (mode === 'scroll') {
     const d = await inspect(1440, 900, SCROLL), m = await inspect(390, 844, SCROLL);
     console.log(JSON.stringify([...new Set([...(d.value ?? []).map(x => 'desktop: ' + x), ...(m.value ?? []).map(x => 'mobile: ' + x)])]));
+  } else if (mode === 'assets') {
+    // TSV for fetch_assets.py: assets/auto/<name><TAB><url>
+    const { value } = await inspect(1440, 900, ASSETS);
+    const seen = new Set();
+    for (const raw of value ?? []) {
+      let u = new URL(raw);
+      if (u.pathname.endsWith('/_next/image') && u.searchParams.get('url')) u = new URL(u.searchParams.get('url'), u);
+      let name = decodeURIComponent(u.pathname.split('/').filter(Boolean).slice(-2).join('-') || 'image').replace(/[^A-Za-z0-9._-]+/g, '-').slice(-80);
+      if (!/\.(jpe?g|png|gif|webp|avif|svg|mp4|webm|ico)$/i.test(name)) name += '.jpg';
+      while (seen.has(name)) name = 'x' + name;
+      seen.add(name);
+      console.log(`assets/auto/${name}\t${raw}`);
+    }
+    for (const line of await captureCanvases(process.argv[4] || `${process.env.HOME}/redesign/assets/auto`)) console.log(line);
   } else if (mode === 'shot') {
     // Full-page capture for the scrolling grid: 1440 CSS px wide, saved at half scale as JPEG, height capped.
     const out = process.argv[4];
