@@ -19,7 +19,14 @@ const ROOT = join(import.meta.dir, '..');
 const OUT = join(ROOT, 'shares');
 const SITE = join(OUT, 'site');
 const REGISTRY = join(OUT, 'index.json');
-const ORIGIN = (process.env.SHARE_ORIGIN ?? 'https://gondola.kilian.solutions').replace(/\/$/, '');
+// Where shares are published, e.g. https://gondola.example.com or your https://gondola.<you>.workers.dev address.
+// Needed to build a share (prompts and link previews use full URLs); `bun run share deploy` works without it.
+const ORIGIN = (process.env.SHARE_ORIGIN ?? '').replace(/\/$/, '');
+const needOrigin = () => {
+  if (!/^https:\/\//.test(ORIGIN)) throw new Error(
+    'set SHARE_ORIGIN in .env to the address your shares are served from, e.g. https://gondola.example.com (a domain on your ' +
+    'Cloudflare account) or your free workers.dev address: run `bun run share deploy` once, it prints it.');
+};
 const PROJECT = process.env.SHARE_PROJECT ?? 'gondola';
 
 type Share = { slug: string; run_id: string; url: string; count: number; created_at: string; updated_at: string };
@@ -66,6 +73,7 @@ async function findRun(arg: string) {
 }
 
 async function publish(arg: string, skip: number[]) {
+  needOrigin();
   const run = await findRun(arg);
   if (run.status !== 'done') throw new Error(`run ${run.id} is ${run.status}, not done`);
   const reg = await registry();
@@ -206,11 +214,11 @@ async function deploy() {
   if (files > 19_000) console.warn(`! ${files} files: Cloudflare allows 20,000 per site. Remove old shares (bun run share remove <slug>).`);
   // A Cloudflare Worker that only serves the static folder (Cloudflare's successor to Pages). With SHARE_DOMAIN set,
   // the deploy also attaches that domain; it must not have another DNS record (delete the old one first).
-  const domain = process.env.SHARE_DOMAIN ?? new URL(ORIGIN).hostname;
+  const domain = process.env.SHARE_DOMAIN ?? (ORIGIN ? new URL(ORIGIN).hostname : '');
   const config = {
     name: PROJECT, compatibility_date: '2026-11-01', workers_dev: true,
     assets: { directory: 'site', html_handling: 'auto-trailing-slash' },
-    ...(domain.endsWith('.workers.dev') ? {} : { routes: [{ pattern: domain, custom_domain: true }] }),
+    ...(!domain || domain.endsWith('.workers.dev') ? {} : { routes: [{ pattern: domain, custom_domain: true }] }),
   };
   await writeFile(join(OUT, 'wrangler.json'), JSON.stringify(config, null, 2));
   await rm(join(OUT, 'wrangler.jsonc'), { force: true });

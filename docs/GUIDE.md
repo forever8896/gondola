@@ -113,7 +113,8 @@ nothing of yours has to stay online.
 One-time setup: `bunx wrangler login`, then set `SHARE_ORIGIN` in `.env` to the address you want (e.g.
 `https://gondola.example.com`, on a domain in the same Cloudflare account). The first `bun run share` creates the
 Worker and attaches the domain; the domain must not already have a DNS record of its own (delete an old one first).
-`SHARE_PROJECT` names the Worker (default `gondola`).
+`SHARE_PROJECT` names the Worker (default `gondola`). No domain? Run `bun run share deploy` once without `SHARE_ORIGIN`: it publishes to your free
+`https://gondola.<your-subdomain>.workers.dev` address and prints it; put that in `SHARE_ORIGIN`.
 
 ```sh
 bun run share example.com           # publish the latest finished run for example.com, prints the link
