@@ -179,6 +179,7 @@ function buildCard(key, { grid = false } = {}) {
   if (!grid) {
     c.copy.addEventListener('click', ev => { ev.stopPropagation(); copyPrompt(key, c.copy); });
     c.open.addEventListener('click', ev => ev.stopPropagation());
+    e.querySelector('.ctl').addEventListener('click', ev => ev.stopPropagation());   // a near-miss next to the buttons does nothing
     c.screen.addEventListener('mouseenter', () => { c.hover = true; syncPlayback(); });
     c.screen.addEventListener('mouseleave', () => { c.hover = false; clearTimeout(c.resume); c.resume = setTimeout(syncPlayback, 1200); });
     e.addEventListener('click', () => onCardClick(c));
