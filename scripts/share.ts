@@ -102,6 +102,14 @@ async function publish(arg: string, skip: number[]) {
       }
       await put(join(dir, 'p', String(d.n), f.path), body);
     }
+    // A capture that half-failed leaves only the full-page shot: cut the first screen out of it for the viewer.
+    const shots = join(dir, 'data/designs', String(d.n));
+    if (!existsSync(join(shots, 'desktop.png')) && existsSync(join(shots, 'full.jpg'))) {
+      const mk = Bun.which('magick') ?? Bun.which('convert');
+      if (mk) await Bun.spawn([mk, join(shots, 'full.jpg'), '-crop', '720x450+0+0', '+repage', '-resize', '1440x900', join(shots, 'desktop.png')]).exited;
+      console.warn(`! design ${d.n} had no desktop screenshot; made one from its full-page shot`);
+    }
+    if (!existsSync(join(shots, 'mobile.png')) && existsSync(join(shots, 'desktop.png'))) await cp(join(shots, 'desktop.png'), join(shots, 'mobile.png'));
     const src = files.filter((f: any) => !f.path.startsWith('_shot/') && f.path !== 'design.json').map((f: any) => f.path);
     await put(join(dir, 'data/designs', String(d.n), 'prompt.txt'), claudePrompt(run, d, src, pageBase));
     pub.push({ ...publicDesign(d), token: String(d.n), live: false, error: null });
