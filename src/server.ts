@@ -15,7 +15,7 @@ const MODEL_ALLOW = new Set([
   'openrouter:deepseek/deepseek-v4.1-flash', 'openrouter:xiaomi/mimo-v2.6-pro', 'openrouter:google/gemini-3.8-flash',
   'openrouter:google/gemini-3.7-flash', 'openrouter:anthropic/claude-haiku-5.5', 'openrouter:z-ai/glm-5.3',
   'openrouter:z-ai/glm-5.3-flash', 'openrouter:minimax/minimax-m3', 'openrouter:openai/gpt-6-luna',
-  'claude-haiku-5-5', 'claude-sonnet-5-5',
+  'claude-haiku-5-5', 'claude-sonnet-5-5', 'openrouter:anthropic/claude-sonnet-5.5',
 ]);
 const PUBLIC = new URL('../public/', import.meta.url).pathname;
 if (!SECRET || SECRET.length < 32) throw new Error('SESSION_SECRET missing');

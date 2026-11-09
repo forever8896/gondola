@@ -6,7 +6,8 @@ import { sql, publicDesign, publicRun } from './db';
 import { boat, lastJson, putFile, exec, q, StartLimiter } from './boat';
 import { SUBSCRIPTION, claudeLocal } from './llm';
 
-const MODEL = process.env.MODEL ?? 'openrouter:deepseek/deepseek-v4.1-flash';
+// The designer model. Sonnet 5.5 designs clearly better than Haiku 5.5 at about the same speed (A/B, 2026-11-09).
+const MODEL = process.env.MODEL ?? (process.env.AI_BACKEND === 'subscription' ? 'claude-sonnet-5-5' : 'openrouter:anthropic/claude-sonnet-5.5');
 const MAX_ACTIVE = Number(process.env.MAX_ACTIVE_SANDBOXES ?? 95);
 const AGENT_BUDGET_MS = Number(process.env.AGENT_BUDGET_MIN ?? 12) * 60_000;
 const QA_FIX_MS = 5 * 60_000;

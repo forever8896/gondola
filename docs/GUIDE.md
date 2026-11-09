@@ -25,12 +25,12 @@ it there; otherwise run `boat ai profile set-key default openrouter-api-key`.
 | Setting | `AI_BACKEND=openrouter` | `AI_BACKEND=subscription` |
 | Design and reading agents (in the sandboxes) | any OpenRouter model through Boat's `pi`/`opencode` harness, on the OpenRouter key in your Boat AI profile | Claude Code through Boat's `claude` harness, on the Claude account connected to your Boat AI profile |
 | Curator and image descriptions (on your machine) | OpenRouter API (`OPENROUTER_API_KEY`) | your local Claude Code CLI (`claude -p`) |
-| Cost | ~$2 per 25 designs in tokens | included in your subscription, within its usage limits |
+| Cost | ~$2 per 25 designs with Haiku; several times that with Sonnet (the default, clearly better designs) | included in your subscription, within its usage limits |
 
 **Using your subscription:**
 1. Connect your Claude account to your **default** profile in the Boat dashboard (`boat dashboard` → AI credentials).
 2. Install [Claude Code](https://docs.anthropic.com/claude-code) on the machine running Gondola and sign in (`claude`).
-3. In `.env`: `AI_BACKEND=subscription`, `MODEL=claude-haiku-5-5`, `EXTRACT_MODEL=claude-haiku-5-5`, and optionally
+3. In `.env`: `AI_BACKEND=subscription`, `MODEL=claude-sonnet-5-5`, `EXTRACT_MODEL=claude-haiku-5-5`, and optionally
    `AGENT_REASONING=low` for quicker agent steps.
 4. `bun run doctor` checks both: the Claude account in Boat and the local CLI.
 

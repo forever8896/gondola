@@ -40,7 +40,8 @@ You need [Bun](https://bun.sh), [Docker](https://docs.docker.com/get-docker/), a
 subscription**: connect it in Boat and Gondola runs every agent as Claude Code
 ([how](docs/GUIDE.md#two-ways-to-pay-for-the-ai)).
 
-A 25-design run costs about **$2** in model tokens plus a few cents of Boat compute, and takes 5–7 minutes. Set
+A 25-design run takes about 5 minutes. On your Claude subscription it costs nothing extra; on OpenRouter it's about **$2**
+in tokens with Haiku, several times that with Sonnet (the default), plus a few cents of Boat compute. Set
 `DEFAULT_COUNT=50` in `.env` for the full wall.
 
 Recording a demo? `bun run prewarm yourdomain.com` reads the site ahead of time, so the next run starts forking
@@ -49,8 +50,8 @@ the moment you press enter.
 ## Built with
 
 - **[Boat](https://boat.dev)**: sandboxes that fork in seconds, live preview URLs and per-second billing
-- **Claude Haiku 5.5** (designs, art direction), **DeepSeek V4.1 Flash** (reading the site) and **Gemini
-  Flash-Lite** (describing images), through [OpenRouter](https://openrouter.ai)
+- **Claude Sonnet 5.5** (designs) and **Claude Haiku 5.5** (art direction), either through your own Claude subscription or
+  [OpenRouter](https://openrouter.ai) (with DeepSeek V4.1 Flash reading the site and Gemini Flash-Lite describing images)
 - **Bun** and **Postgres**, with a vanilla JS frontend and no build step
 
 ## Docs
