@@ -10,13 +10,33 @@ troubleshooting.
 | [Bun](https://bun.sh) 1.3+ | runs the server (no npm dependencies) |
 | [Docker](https://docs.docker.com/get-docker/) | runs Postgres locally |
 | A [Boat](https://boat.dev) account and the `boat` CLI, signed in (`boat login`) | the sandboxes. A run needs designs + 1 sandboxes at once; Boat's $20 plan allows 100 |
-| An [OpenRouter](https://openrouter.ai) key with **at least $10 of credit** | the models. Parallel agents reserve credit up front, so a thin balance makes designs fail mid-run |
+| An [OpenRouter](https://openrouter.ai) key with **at least $10 of credit**, *or* your own Claude subscription ([see below](#two-ways-to-pay-for-the-ai)) | the models. With OpenRouter, parallel agents reserve credit up front, so a thin balance makes designs fail mid-run |
 
 `bun run setup` checks all of this, writes `.env` with fresh secrets and starts Postgres. `bun run doctor`
 re-checks at any time, including your Boat plan limits and your OpenRouter balance.
 
 The agents run inside Boat sandboxes and get their model key from your Boat AI profile. `setup` offers to store
 it there; otherwise run `boat ai profile set-key default openrouter-api-key`.
+
+## Two ways to pay for the AI
+
+| | OpenRouter (default) | Your Claude subscription |
+|---|---|---|
+| Setting | `AI_BACKEND=openrouter` | `AI_BACKEND=subscription` |
+| Design and reading agents (in the sandboxes) | any OpenRouter model through Boat's `pi`/`opencode` harness, on the OpenRouter key in your Boat AI profile | Claude Code through Boat's `claude` harness, on the Claude account connected to your Boat AI profile |
+| Curator and image descriptions (on your machine) | OpenRouter API (`OPENROUTER_API_KEY`) | your local Claude Code CLI (`claude -p`) |
+| Cost | ~$2 per 25 designs in tokens | included in your subscription, within its usage limits |
+
+**Using your subscription:**
+1. Connect your Claude account to your **default** profile in the Boat dashboard (`boat dashboard` → AI credentials).
+2. Install [Claude Code](https://docs.anthropic.com/claude-code) on the machine running Gondola and sign in (`claude`).
+3. In `.env`: `AI_BACKEND=subscription`, `MODEL=claude-haiku-5-5`, `EXTRACT_MODEL=claude-haiku-5-5`, and optionally
+   `AGENT_REASONING=low` for quicker agent steps.
+4. `bun run doctor` checks both: the Claude account in Boat and the local CLI.
+
+Subscriptions have usage limits, and a run starts many Claude Code sessions at once, so smaller runs (10–25
+designs) are more reliable than 50. Use it with your own account for your own sites; follow Anthropic's terms for
+your plan. A Gondola hosted for other people should use API keys.
 
 ## Where the design directions come from
 

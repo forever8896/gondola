@@ -4,6 +4,7 @@ import { mkdir, rm, readdir, lstat } from 'node:fs/promises';
 import { join, extname } from 'node:path';
 import { sql, publicDesign, publicRun } from './db';
 import { boat, lastJson, putFile, exec, q, StartLimiter } from './boat';
+import { SUBSCRIPTION, claudeLocal } from './llm';
 
 const MODEL = process.env.MODEL ?? 'openrouter:deepseek/deepseek-v4.1-flash';
 const MAX_ACTIVE = Number(process.env.MAX_ACTIVE_SANDBOXES ?? 95);
@@ -26,7 +27,8 @@ const TMP = new URL('../tmp/', import.meta.url).pathname;
 const ALL_BRIEFS: any[] = await Bun.file(KIT + 'briefs.json').json();
 // Calm, low-impact directions (pure type, e-reader, docs, GOV.UK...) are kept in the file but out of the default pool:
 // they read as bland next to the showpiece directions in a full set.
-const BRIEFS = process.env.INCLUDE_CALM_BRIEFS === '1' ? ALL_BRIEFS : ALL_BRIEFS.filter(b => b.tier !== 'calm');
+// Retired briefs (tier 'retired') stay in the file for reference but are never picked.
+const BRIEFS = ALL_BRIEFS.filter(b => b.tier !== 'retired' && (process.env.INCLUDE_CALM_BRIEFS === '1' || b.tier !== 'calm'));
 
 export const limiter = new StartLimiter([
   // Plan limits are 12/60/200; with Boat "extra starts" on they rise to 36/360/1200 (billed per start over the plan).
@@ -120,9 +122,12 @@ function describeTool(use: any): string | null {
 async function prompt(model: string, sandbox: string, text: string, onAction: (a: string) => void, timeoutMs: number) {
   const seen = new Set<string>();
   // Boat's pi harness gets a 404 for Anthropic models via OpenRouter (verified 2026-11-08); opencode works.
-  const provider = /^openrouter:anthropic\//.test(model) ? 'opencode' : 'pi';
+  const provider = /^openrouter:anthropic\//.test(model) ? 'opencode'
+    : /^(claude-|sonnet|opus|haiku)/.test(model) ? 'claude'   // Claude Code in the sandbox, on your Boat Claude sign-in
+    : 'pi';
   let error = '';
-  const r = await boat(['prompt', sandbox, '--provider', provider, '--model', model, '--json', text], {
+  const effort = provider === 'claude' && process.env.AGENT_REASONING ? ['--reasoning-effort', process.env.AGENT_REASONING] : [];
+  const r = await boat(['prompt', sandbox, '--provider', provider, '--model', model, ...effort, '--json', text], {
     timeoutMs,
     onLine: line => {
       const ev = JSON.parse(line);
@@ -224,7 +229,7 @@ function parsePicks(text: string): any[] {
 
 export async function curateBriefs(run: any, n: number, exclude: Set<number>): Promise<any[] | null> {
   const key = process.env.OPENROUTER_API_KEY;
-  if (!key) return null;
+  if (!key && !SUBSCRIPTION) return null;
   const kit = async (f: string) => {
     const [r] = await sql`SELECT bytes FROM run_assets WHERE run_id = ${run.id} AND path = ${'_kit/' + f}`;
     return r ? new TextDecoder().decode(r.bytes) : '';
@@ -234,6 +239,7 @@ export async function curateBriefs(run: any, n: number, exclude: Set<number>): P
   if (pool.length < n) pool = BRIEFS;
   const library = shuffle(pool).map(b => `${b.brief_id} | ${b.style_family} | ${(b.directory_tags ?? []).map((t: string) => t.split(': ')[1]).join(', ')} | ${b.reference} | ${String(b.layout).slice(0, 100)}`).join('\n');
   const chat = async (prompt: string, maxTokens: number) => {
+    if (SUBSCRIPTION) return parsePicks(await claudeLocal(prompt + '\nReply with the JSON object only, no prose, no code fences.'));
     const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: { Authorization: `Bearer ${key}`, 'content-type': 'application/json' },
@@ -344,9 +350,11 @@ async function ingest(run: any, ttlSeconds = 7200): Promise<{ base: string; phot
     `1) Write ~/kit/content.md: a complete, faithful extraction of ALL human-visible content of this homepage in reading order, grouped by section: ` +
     `name/brand, headlines, body text, every project/product/service item with its description and links, stats, testimonials that are on the page, ` +
     `contact details, social links, nav and footer. Copy text verbatim; do not summarise or invent. Make links absolute (base ${run.origin}). ` +
-    `For each meaningful image or video (hero photo, project images, logos, video posters; skip tracking pixels and tiny icons), refer to it as ` +
+    `For each meaningful image or video (the hero or banner photo, CSS background images, project images, the site's logo, video posters; ` +
+    `skip tracking pixels and tiny UI icons), refer to it as ` +
     `assets/<short-path>.<ext> where <short-path> is derived from its URL path. ` +
     `2) Write ~/kit/assets.tsv: one line per media file: <that assets/... path><TAB><absolute URL>. At most 50 lines. ` +
+    `Use the largest version of each image (from srcset, or the original behind an image-resizer URL such as /_next/image?url=…), never a thumbnail. ` +
     `Reply with just the section list.`,
     a => log(run.id, null, `extractor: ${a}`), 900_000);
   if (extract.code !== 0) throw new Error('content extraction agent failed');
@@ -407,7 +415,7 @@ async function writeMediaNotes(run: any, base: string): Promise<number> {
   // Describe the largest raster images with a cheap vision model (one request per run, ~$0.001).
   const notes = new Map<string, any>();
   const pick = media.filter(m => m.w >= 200 && m.h >= 200 && m.size < 5 * 2 ** 20).sort((a, b) => b.w * b.h - a.w * a.h).slice(0, 8);
-  if (pick.length && process.env.OPENROUTER_API_KEY) {
+  if (pick.length && (process.env.OPENROUTER_API_KEY || SUBSCRIPTION)) {
     try {
       const dir = join(TMP, `${run.id}-media`);
       await mkdir(dir, { recursive: true });
@@ -426,15 +434,23 @@ async function writeMediaNotes(run: any, base: string): Promise<number> {
         content.push({ type: 'text', text: `path: ${p.path}` });
         content.push({ type: 'image_url', image_url: { url: `data:${mime};base64,${Buffer.from(await f.arrayBuffer()).toString('base64')}` } });
       }
-      const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`, 'content-type': 'application/json' },
-        body: JSON.stringify({ model: VISION_MODEL, messages: [{ role: 'user', content }], response_format: { type: 'json_object' }, max_tokens: 2000 }),  // no reasoning switch: this Gemini endpoint rejects disabling it
-        signal: AbortSignal.timeout(90_000),
-      });
-      const j: any = await r.json();
-      if (!j?.choices) throw new Error('OpenRouter: ' + JSON.stringify(j?.error ?? j).slice(0, 160));
-      const parsed = JSON.parse(String(j?.choices?.[0]?.message?.content ?? '{}').replace(/^```(json)?|```$/g, ''));
+      let reply: string;
+      if (SUBSCRIPTION) {
+        // Local Claude Code reads the downloaded files itself (Read tool, this folder only).
+        const files = pick.map(p => `- ${p.path}: ${join(dir, p.path)}`).join('\n');
+        reply = await claudeLocal(`${content[0].text}\nRead each of these image files, then reply with the JSON object only.\n${files}`, { readDir: dir, timeoutMs: 240_000 });
+      } else {
+        const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`, 'content-type': 'application/json' },
+          body: JSON.stringify({ model: VISION_MODEL, messages: [{ role: 'user', content }], response_format: { type: 'json_object' }, max_tokens: 2000 }),  // no reasoning switch: this Gemini endpoint rejects disabling it
+          signal: AbortSignal.timeout(90_000),
+        });
+        const j: any = await r.json();
+        if (!j?.choices) throw new Error('OpenRouter: ' + JSON.stringify(j?.error ?? j).slice(0, 160));
+        reply = String(j.choices[0]?.message?.content ?? '{}');
+      }
+      const parsed = JSON.parse(reply.replace(/^[^{]*/, '').replace(/[^}]*$/, '') || '{}');
       for (const im of parsed.images ?? []) if (typeof im?.path === 'string') notes.set(im.path, im);
       await rm(dir, { recursive: true, force: true });
     } catch (e: any) {

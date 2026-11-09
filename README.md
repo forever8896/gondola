@@ -36,7 +36,9 @@ bun run start     # open http://localhost:8787
 ```
 
 You need [Bun](https://bun.sh), [Docker](https://docs.docker.com/get-docker/), a [Boat](https://boat.dev) account
-(`boat login`) and an [OpenRouter](https://openrouter.ai) key with about $10 of credit.
+(`boat login`) and an [OpenRouter](https://openrouter.ai) key with about $10 of credit, **or your own Claude
+subscription**: connect it in Boat and Gondola runs every agent as Claude Code
+([how](docs/GUIDE.md#two-ways-to-pay-for-the-ai)).
 
 A 25-design run costs about **$2** in model tokens plus a few cents of Boat compute, and takes 5–7 minutes. Set
 `DEFAULT_COUNT=50` in `.env` for the full wall.

@@ -5,7 +5,18 @@ Each line: <local path under assets/>\t<absolute http(s) URL>. The list was writ
 untrusted page content, so every line is validated: path must stay inside assets/, URL must be http(s),
 files are capped in size and count.
 """
-import os, sys, urllib.request, posixpath
+import os, sys, urllib.request, urllib.parse, posixpath
+
+
+def original_url(url):
+    """Image CDNs and resizers serve thumbnails; fetch the original instead.
+    Next.js: /_next/image?url=<original>&w=96 -> <original>"""
+    u = urllib.parse.urlparse(url)
+    if u.path.endswith('/_next/image'):
+        inner = urllib.parse.parse_qs(u.query).get('url', [''])[0]
+        if inner:
+            return urllib.parse.urljoin(url, inner)
+    return url
 
 HOME = os.path.expanduser('~')
 ROOT = os.path.join(HOME, 'redesign')
@@ -23,6 +34,7 @@ for line in open(os.path.join(HOME, 'kit', 'assets.tsv'), encoding='utf-8', erro
         print('skip path', local); continue
     if not url.startswith(('http://', 'https://')):
         print('skip url', url); continue
+    url = original_url(url)
     if n >= MAX_FILES or total >= MAX_TOTAL:
         print('cap reached'); break
     dest = os.path.join(ROOT, norm)

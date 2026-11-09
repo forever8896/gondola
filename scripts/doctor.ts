@@ -1,6 +1,7 @@
 // `bun run doctor`: checks everything a run depends on and says what to fix.
 // Exit code 1 if something blocking is wrong.
 import { SQL } from 'bun';
+import { SUBSCRIPTION, claudeLocal } from '../src/llm';
 
 const env = process.env;
 let blocking = 0;
@@ -17,7 +18,7 @@ const boat = async (args: string[]) => {
 console.log('Gondola doctor');
 
 // .env
-for (const k of ['DATABASE_URL', 'SESSION_SECRET', 'OPENROUTER_API_KEY', 'APP_ORIGIN', 'CONTENT_ORIGIN'])
+for (const k of ['DATABASE_URL', 'SESSION_SECRET', ...(SUBSCRIPTION ? [] : ['OPENROUTER_API_KEY']), 'APP_ORIGIN', 'CONTENT_ORIGIN'])
   if (!env[k]) bad(`${k} is missing in .env (run: bun run setup)`);
 if ((env.SESSION_SECRET ?? '').length < 32) bad('SESSION_SECRET must be at least 32 characters');
 
@@ -46,11 +47,18 @@ if (limits) {
 }
 const profiles = await boat(['ai', 'profiles']);
 const def = profiles?.profiles?.find((p: any) => p.isDefault);
-if (def?.connected?.includes('openrouter-api-key')) ok("Boat: OpenRouter key is in your default AI profile (the agents can reach models)");
+const creds: string[] = [...(def?.connected ?? []), ...Object.keys(def?.accounts ?? {})];
+if (SUBSCRIPTION) {
+  // Agents run Claude Code in the sandboxes on the Claude sign-in stored in your Boat profile.
+  if (creds.some(c => /claude|anthropic/i.test(c))) ok(`Boat: Claude credentials in your default AI profile (${creds.filter(c => /claude|anthropic/i.test(c)).join(', ')})`);
+  else bad("Boat: no Claude sign-in in your default AI profile. Connect your Claude account in the Boat dashboard (boat dashboard → AI credentials)");
+  try { await claudeLocal('Reply with the word OK.', { timeoutMs: 90_000 }); ok('Local Claude Code CLI works (curator and image descriptions use your subscription)'); }
+  catch (e: any) { bad(`Local Claude Code CLI failed: ${String(e?.message ?? e).slice(0, 120)}. Install Claude Code and sign in (claude)`); }
+} else if (creds.includes('openrouter-api-key')) ok("Boat: OpenRouter key is in your default AI profile (the agents can reach models)");
 else bad("Boat: no OpenRouter key in your default AI profile. Run: boat ai profile set-key default openrouter-api-key");
 
 // OpenRouter
-if (env.OPENROUTER_API_KEY) {
+if (env.OPENROUTER_API_KEY && !SUBSCRIPTION) {
   const h = { Authorization: `Bearer ${env.OPENROUTER_API_KEY}` };
   const key: any = await fetch('https://openrouter.ai/api/v1/key', { headers: h }).then(r => r.ok ? r.json() : null).catch(() => null);
   if (!key) bad('OpenRouter: key rejected');
