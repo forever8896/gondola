@@ -229,7 +229,11 @@ try {
     const skip = (opt('--skip') ?? '').split(',').filter(Boolean).map(Number);
     await buildRoot();
     const url = await publish(cmd, skip);
-    if (!flag('--no-deploy')) await deploy();
+    if (!flag('--no-deploy')) {
+      await deploy();
+      // Cloudflare rolls a new version out over ~15 s: only hand out the link once it loads.
+      for (let i = 0; i < 24; i++) { const r = await fetch(`${url}og.jpg?v=${Date.now()}`).catch(() => null); if (r?.ok) break; await Bun.sleep(5000); }
+    }
     console.log(`\n${flag('--no-deploy') ? 'built (not deployed)' : 'published'}: ${url}`);
   }
 } catch (e: any) {
