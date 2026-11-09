@@ -24,7 +24,7 @@ jobs:
         run: |
           mkdir -p _site/media
           cp -r site/. _site/
-          cp docs/media/timelapse.mp4 docs/media/poster.jpg _site/media/
+          cp docs/media/promo.mp4 docs/media/promo-poster.jpg docs/media/og.jpg docs/media/poster.jpg _site/media/
           cp public/logo.png public/favicon.png public/apple-touch-icon.png _site/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
