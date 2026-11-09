@@ -106,6 +106,12 @@ const SCROLL = `(async () => { ${HELPERS}
   const short = e => label(e).slice(0, 34);
   const H = () => Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
   const stickies = [...document.querySelectorAll('body *')].filter(e => /sticky|fixed/.test(getComputedStyle(e).position));
+  // Content meant to move sideways: inside a horizontally scrollable rail, or in an animated (marquee) track.
+  const sideways = e => { for (let a = e.parentElement; a && a !== document.body; a = a.parentElement) {
+    const cs = getComputedStyle(a);
+    if (/auto|scroll/.test(cs.overflowX) && a.scrollWidth > a.clientWidth + 4) return true;
+    if (cs.animationName && cs.animationName !== 'none' && /translate|matrix/.test(cs.transform + (a.getAnimations?.().length ? 'translate' : ''))) return true;
+  } return false; };
   const isHeader = (e, r) => r.top <= 2 && r.height < 140 && r.width > vw * 0.6;   // ordinary site header bar
   const opacityOf = e => { let o = 1; for (let a = e; a && a !== document.documentElement; a = a.parentElement) { const s = getComputedStyle(a); o *= parseFloat(s.opacity); if (s.visibility === 'hidden') return 0; } return o; };
   const steps = Math.min(14, Math.max(2, Math.ceil(H() / (vh * 0.75))));
@@ -116,6 +122,7 @@ const SCROLL = `(async () => { ${HELPERS}
     // titles
     for (const h of [...document.querySelectorAll('h1,h2,h3,h4,[class*=title],[class*=heading],[class*=display]')].slice(0, 120)) {
       const r = h.getBoundingClientRect(); if (!r.width || r.bottom < 0 || r.top > vh || !h.innerText?.trim()) continue;
+      if (sideways(h)) continue;   // inside a horizontal rail or a moving marquee: off-screen on purpose
       const range = document.createRange(); range.selectNodeContents(h); const t = range.getBoundingClientRect();
       if (t.right > vw + 4 || t.left < -4) add('edge:' + short(h), 'title "' + short(h) + '" runs off the screen edge');
       for (let a = h.parentElement; a && a !== document.body; a = a.parentElement) {
@@ -128,6 +135,7 @@ const SCROLL = `(async () => { ${HELPERS}
       }
       for (const p of [...(h.closest('section, article, header, footer') ?? document.body).querySelectorAll('p, li')].slice(0, 60)) {
         if (h.contains(p) || p.contains(h) || !p.innerText?.trim()) continue;
+        if (p.innerText.trim().length < 28 && parseFloat(getComputedStyle(p).fontSize) <= 14) continue;   // small decorative label, not body text
         const pr = p.getBoundingClientRect();
         const ox = Math.min(t.right, pr.right) - Math.max(t.left, pr.left), oy = Math.min(t.bottom, pr.bottom) - Math.max(t.top, pr.top);
         if (ox > 8 && oy > 8) { add('overlap:' + short(h), 'title "' + short(h) + '" overlaps the text "' + short(p) + '"'); break; }

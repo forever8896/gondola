@@ -699,6 +699,16 @@ async function buildDesign(run: any, base: string, d: any, photos: number, curat
           `and must not cover text (or stop being sticky on small screens); every entrance animation must end visible. Then stop.`,
           onAction, Date.now() + QA_FIX_MS);
         qa.scroll_after = await scrollCheck(sb);
+        // One more round if real problems remain and the agent still has time.
+        if (qa.scroll_after.length && deadline - Date.now() > 90_000) {
+          await log(run.id, d.n, `${qa.scroll_after.length} scroll issue${qa.scroll_after.length > 1 ? 's' : ''} left, one more round`);
+          await agentTurn(run, d, sb,
+            `These scroll problems are still there after your last fix:\n${qa.scroll_after.map((i: string) => '- ' + i).join('\n')}\n` +
+            `Fix the cause, not the symptom: give the titles room (smaller clamp() maximum, allow wrapping, more space between the ` +
+            `title and the text), or move the text out from under them. Keep the design. Then stop.`,
+            onAction, Math.min(deadline, Date.now() + QA_FIX_MS));
+          qa.scroll_after = await scrollCheck(sb);
+        }
       }
       await sql`UPDATE designs SET qa = ${JSON.stringify(qa)}::text::jsonb, tool_calls = ${calls} WHERE id = ${d.id}`;
     }
