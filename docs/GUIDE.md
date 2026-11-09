@@ -105,17 +105,13 @@ The sweeper removes the prepared copy when it expires.
 
 Publish a finished run as a page anyone can open: the same grid and scroll view, every design as its own standalone
 page, Copy prompt on each one, Share on X / Copy link buttons, and a link preview made from that run's designs.
-Shares are static files on Cloudflare Pages (free), so nothing of yours has to stay online.
+Shares are static files served by Cloudflare (a static-assets Worker, the successor to Cloudflare Pages; free), so
+nothing of yours has to stay online.
 
-One-time setup:
-
-```sh
-bunx wrangler login                                            # opens Cloudflare in your browser
-bunx wrangler pages project create gondola --production-branch main
-```
-
-Then add your domain to the project in the Cloudflare dashboard (Workers & Pages → gondola → Custom domains) and
-set `SHARE_ORIGIN` in `.env` to it (and `SHARE_PROJECT` if you named the project differently).
+One-time setup: `bunx wrangler login`, then set `SHARE_ORIGIN` in `.env` to the address you want (e.g.
+`https://gondola.example.com`, on a domain in the same Cloudflare account). The first `bun run share` creates the
+Worker and attaches the domain; the domain must not already have a DNS record of its own (delete an old one first).
+`SHARE_PROJECT` names the Worker (default `gondola`).
 
 ```sh
 bun run share example.com           # publish the latest finished run for example.com, prints the link
@@ -127,7 +123,7 @@ bun run share deploy                # redeploy (e.g. after changing the landing 
 
 Each share lives at `/s/<site>-<random>/`: unlisted (the address can't be guessed, and search engines are told not
 to index it), at the same address when you republish the run. A design's own page is `/s/<slug>/p/<n>/`. The deploy
-also carries the landing page from `site/`. Cloudflare Pages allows 20,000 files per site, about 60 shares of 50
+also carries the landing page from `site/`. Cloudflare allows 20,000 files per site, about 60 shares of 50
 designs; `bun run share` warns before that. Design pages get the same restrictive content policy as in the app.
 
 ## Configuration
