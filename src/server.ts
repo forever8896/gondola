@@ -146,7 +146,14 @@ Bun.serve({
         if (!admin || process.env.ALLOW_MODEL_OVERRIDE !== '1' || !/^[A-Za-z0-9_-]{22}$/.test(String(body.briefs_from))) return json({ error: 'briefs_from not allowed' }, 400);
         briefsFrom = String(body.briefs_from);
       }
-      const started = await startRun({ sid, admin, url: u, count, model, briefsFrom });
+      // Admin: directions the run must include, by brief id (e.g. a style the person liked in an earlier run).
+      let includeBriefs: number[] | null = null;
+      if (body.include_briefs != null) {
+        const ids = Array.isArray(body.include_briefs) ? body.include_briefs.map(Number) : [];
+        if (!admin || !ids.length || ids.length > 10 || !ids.every((n: number) => Number.isInteger(n) && n > 0)) return json({ error: 'include_briefs not allowed' }, 400);
+        includeBriefs = ids;
+      }
+      const started = await startRun({ sid, admin, url: u, count, model, briefsFrom, includeBriefs });
       if (!started.ok) return json({ error: started.error }, started.status);
       return json({ id: started.id }, 201);
     }

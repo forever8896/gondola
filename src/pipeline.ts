@@ -313,7 +313,7 @@ function parsePicks(text: string): any[] {
   return out;
 }
 
-export async function curateBriefs(run: any, n: number, exclude: Set<number>, recent: Set<number> = new Set()): Promise<any[] | null> {
+export async function curateBriefs(run: any, n: number, exclude: Set<number>, recent: Set<number> = new Set(), forced: any[] = []): Promise<any[] | null> {
   const key = process.env.OPENROUTER_API_KEY;
   if (!key && !SUBSCRIPTION) return null;
   const kit = async (f: string) => {
@@ -323,9 +323,12 @@ export async function curateBriefs(run: any, n: number, exclude: Set<number>, re
   const content = (await kit('content.md')).slice(0, 7000), style = await kit('original-style.md');
   // Directions this site has never had always go in first; when there are fewer than n, the curator picks the rest
   // from the ones it has had (they come back with a new palette and hero idea).
-  const fresh = BRIEFS.filter(b => !exclude.has(b.brief_id));
-  const mustInclude = fresh.length < n ? capWild(fresh, [], wildLimit(n)) : [];
-  const pool = fresh.length >= n ? fresh : BRIEFS.filter(b => exclude.has(b.brief_id));
+  // Requested directions (run.include_briefs) always go in, even if this site had them before.
+  const forcedIds = new Set(forced.map(b => b.brief_id));
+  const fresh = BRIEFS.filter(b => !exclude.has(b.brief_id) && !forcedIds.has(b.brief_id));
+  const room = n - forced.length;
+  const mustInclude = [...forced, ...(fresh.length < room ? capWild(fresh, forced, wildLimit(n)) : [])];
+  const pool = (fresh.length >= room ? fresh : BRIEFS.filter(b => exclude.has(b.brief_id))).filter(b => !forcedIds.has(b.brief_id));
   const need = n - mustInclude.length;
   const library = shuffle(pool).map(b => `${b.brief_id} | ${b.style_family}${isWild(b) ? ' [wildcard]' : ''}${recent.has(b.brief_id) ? ' (recent)' : ''} | ${(b.directory_tags ?? []).map((t: string) => t.split(': ')[1]).join(', ')} | ${b.reference} | ${String(b.layout).slice(0, 100)}`).join('\n');
   const chat = async (prompt: string, maxTokens: number) => {
@@ -361,7 +364,7 @@ export async function curateBriefs(run: any, n: number, exclude: Set<number>, re
     `Output only JSON: {"picks": [{"id": <number>, "why": "<max 10 words>"}]}`;
   try {
     const byId = new Map(BRIEFS.map(b => [b.brief_id, b]));
-    const chosen: any[] = mustInclude.map(b => ({ ...b, why: 'a direction this site has never had' }));
+    const chosen: any[] = mustInclude.map(b => ({ ...b, why: forcedIds.has(b.brief_id) ? 'requested for this run' : 'a direction this site has never had' }));
     const fams = new Set<string>(chosen.map(b => b.style_family));
     for (const p of need > 0 ? await chat(choose, 4000) : []) {
       const b = byId.get(Number(p?.id));
@@ -901,7 +904,8 @@ async function executeRun(run: any) {
     const recent = await recentBriefIds(run.id);
     // A/B tests (admin): reuse the exact directions of an earlier run, curator skipped, so only the model differs.
     const copied = run.briefs_from ? (await sql`SELECT brief FROM designs WHERE run_id = ${run.briefs_from} ORDER BY n LIMIT ${run.count}`).map((r: any) => r.brief) : [];
-    const briefs = copied.length ? copied : applyStyle(pickBriefs(run.count, used, [], recent));
+    const forced = (run.include_briefs ?? []).map((id: number) => ALL_BRIEFS.find(b => b.brief_id === Number(id))).filter(Boolean);
+    const briefs = copied.length ? copied : applyStyle(pickBriefs(run.count, used, forced, recent));
     for (let i = 0; i < briefs.length; i++) {
       await sql`INSERT INTO designs (run_id, n, token, brief) VALUES (${run.id}, ${i + 1}, ${randomId(16)}, ${JSON.stringify(briefs[i])}::text::jsonb)
                 ON CONFLICT (run_id, n) DO NOTHING`;
@@ -920,7 +924,7 @@ async function executeRun(run: any) {
 
     // The curator chooses the directions while the sandboxes start; each design waits for it only when needed.
     await setRun(run.id, { status: 'building', phase_note: `forking ${run.count} sandboxes · choosing ${run.count} design directions` });
-    const curated = (copied.length ? Promise.resolve(null) : curateBriefs(run, run.count, used, recent)).then(async picks => {
+    const curated = (copied.length ? Promise.resolve(null) : curateBriefs(run, run.count, used, recent, forced)).then(async picks => {
       if (picks) {
         for (let i = 0; i < picks.length; i++) {
           const [d] = await sql`UPDATE designs SET brief = ${JSON.stringify(picks[i])}::text::jsonb WHERE run_id = ${run.id} AND n = ${i + 1} RETURNING *`;

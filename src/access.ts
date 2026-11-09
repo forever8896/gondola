@@ -21,7 +21,7 @@ type Start = { ok: true; id: string } | { ok: false; status: number; error: stri
  * Create a run. A transaction-scoped advisory lock serialises the checks, so the daily limit can't be
  * over-claimed by simultaneous requests.
  */
-export async function startRun(o: { sid: string; admin: boolean; url: URL; count: number; model: string | null; briefsFrom?: string | null }): Promise<Start> {
+export async function startRun(o: { sid: string; admin: boolean; url: URL; count: number; model: string | null; briefsFrom?: string | null; includeBriefs?: number[] | null }): Promise<Start> {
   return await sql.begin(async tx => {
     await tx`SELECT pg_advisory_xact_lock(424242)`;
     if (!o.admin) {
@@ -33,8 +33,8 @@ export async function startRun(o: { sid: string; admin: boolean; url: URL; count
       }
     }
     const id = randomId(16);
-    await tx`INSERT INTO runs (id, owner, url, origin, count, model, funding, briefs_from)
-             VALUES (${id}, ${o.sid}, ${o.url.href}, ${o.url.origin}, ${o.count}, ${o.model}, ${o.admin ? 'admin' : 'open'}, ${o.briefsFrom ?? null})`;
+    await tx`INSERT INTO runs (id, owner, url, origin, count, model, funding, briefs_from, include_briefs)
+             VALUES (${id}, ${o.sid}, ${o.url.href}, ${o.url.origin}, ${o.count}, ${o.model}, ${o.admin ? 'admin' : 'open'}, ${o.briefsFrom ?? null}, ${o.includeBriefs?.length ? `{${o.includeBriefs.map(Number).join(',')}}` : null}::int[])`;
     return { ok: true, id } as Start;
   });
 }

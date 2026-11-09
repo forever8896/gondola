@@ -109,3 +109,5 @@ CREATE TABLE IF NOT EXISTS warm_bases (
 );
 -- A/B tests: a run that reuses another run's exact directions (admin only).
 ALTER TABLE runs ADD COLUMN IF NOT EXISTS briefs_from text;
+-- Directions a run must include (e.g. one the person liked before), by brief id.
+ALTER TABLE runs ADD COLUMN IF NOT EXISTS include_briefs int[];
