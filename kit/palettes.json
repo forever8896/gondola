@@ -1,0 +1,558 @@
+[
+ {
+  "id": "chalk-cobalt",
+  "theme": "light",
+  "bg": "#f4f3ef",
+  "surface": "#e8e6df",
+  "ink": "#14161c",
+  "muted": "#5b5d66",
+  "accent": "#1f3fff",
+  "accent2": "#ff5a36",
+  "accent_use": "any text",
+  "accent2_use": "shapes and fills only, never text on bg"
+ },
+ {
+  "id": "bone-vermilion",
+  "theme": "light",
+  "bg": "#f2ede4",
+  "surface": "#e6dfd2",
+  "ink": "#1b1714",
+  "muted": "#6b6257",
+  "accent": "#e2401c",
+  "accent_use": "large text and shapes only"
+ },
+ {
+  "id": "ice-ink",
+  "theme": "light",
+  "bg": "#eef2f5",
+  "surface": "#dfe6ec",
+  "ink": "#0d1b2a",
+  "muted": "#4f5d6b",
+  "accent": "#0057ff",
+  "accent2": "#ffd23f",
+  "accent_use": "any text",
+  "accent2_use": "shapes and fills only, never text on bg"
+ },
+ {
+  "id": "white-safety-orange",
+  "theme": "light",
+  "bg": "#fafaf7",
+  "surface": "#eeeee8",
+  "ink": "#111111",
+  "muted": "#5c5c5c",
+  "accent": "#ff5f00",
+  "accent_use": "shapes and fills only, never text on bg"
+ },
+ {
+  "id": "mist-forest",
+  "theme": "light",
+  "bg": "#eef1ec",
+  "surface": "#dde3d8",
+  "ink": "#13241a",
+  "muted": "#4f5d52",
+  "accent": "#1f6b3a",
+  "accent2": "#e8b100",
+  "accent_use": "any text",
+  "accent2_use": "shapes and fills only, never text on bg"
+ },
+ {
+  "id": "lilac-ink",
+  "theme": "light",
+  "bg": "#f1eef8",
+  "surface": "#e2dcf0",
+  "ink": "#1a1530",
+  "muted": "#5e5874",
+  "accent": "#6a3cff",
+  "accent_use": "any text"
+ },
+ {
+  "id": "pearl-tomato",
+  "theme": "light",
+  "bg": "#f7f4f1",
+  "surface": "#ebe5df",
+  "ink": "#221a17",
+  "muted": "#6e625b",
+  "accent": "#ff3d2e",
+  "accent2": "#2b59c3",
+  "accent_use": "large text and shapes only",
+  "accent2_use": "any text"
+ },
+ {
+  "id": "sky-lemon",
+  "theme": "light",
+  "bg": "#edf5fb",
+  "surface": "#d9e9f5",
+  "ink": "#08263a",
+  "muted": "#496273",
+  "accent": "#0a6ebd",
+  "accent2": "#ffe14d",
+  "accent_use": "any text",
+  "accent2_use": "shapes and fills only, never text on bg"
+ },
+ {
+  "id": "gallery-red",
+  "theme": "light",
+  "bg": "#ffffff",
+  "surface": "#f2f2f2",
+  "ink": "#0a0a0a",
+  "muted": "#575757",
+  "accent": "#e10600",
+  "accent_use": "any text"
+ },
+ {
+  "id": "sage-plum",
+  "theme": "light",
+  "bg": "#eef0e8",
+  "surface": "#dee2d4",
+  "ink": "#1f1a24",
+  "muted": "#5a5862",
+  "accent": "#7b2d6e",
+  "accent_use": "any text"
+ },
+ {
+  "id": "peach-cocoa",
+  "theme": "light",
+  "bg": "#fbf1ea",
+  "surface": "#f3e1d4",
+  "ink": "#2a1a12",
+  "muted": "#6f5a4d",
+  "accent": "#d9480f",
+  "accent_use": "large text and shapes only"
+ },
+ {
+  "id": "concrete-ultramarine",
+  "theme": "light",
+  "bg": "#e9e9e6",
+  "surface": "#dadad5",
+  "ink": "#121212",
+  "muted": "#555555",
+  "accent": "#2d2bd6",
+  "accent_use": "any text"
+ },
+ {
+  "id": "newsprint-red",
+  "theme": "paper",
+  "bg": "#efe9dc",
+  "surface": "#e3dccb",
+  "ink": "#1a1712",
+  "muted": "#5f574a",
+  "accent": "#c8102e",
+  "accent_use": "any text"
+ },
+ {
+  "id": "kraft-cobalt",
+  "theme": "paper",
+  "bg": "#e3d3b8",
+  "surface": "#d6c4a4",
+  "ink": "#1d160d",
+  "muted": "#5a4a35",
+  "accent": "#1d3fbf",
+  "accent_use": "any text"
+ },
+ {
+  "id": "cream-teal",
+  "theme": "paper",
+  "bg": "#f3ead8",
+  "surface": "#e8dcc3",
+  "ink": "#1c1b18",
+  "muted": "#5f5848",
+  "accent": "#00796b",
+  "accent2": "#f25c05",
+  "accent_use": "large text and shapes only",
+  "accent2_use": "shapes and fills only, never text on bg"
+ },
+ {
+  "id": "parchment-oxblood",
+  "theme": "paper",
+  "bg": "#efe6d2",
+  "surface": "#e3d6bb",
+  "ink": "#24130f",
+  "muted": "#64514a",
+  "accent": "#7a1f1f",
+  "accent_use": "any text"
+ },
+ {
+  "id": "ivory-swiss-orange",
+  "theme": "paper",
+  "bg": "#f4efe4",
+  "surface": "#e8e1d1",
+  "ink": "#111111",
+  "muted": "#575247",
+  "accent": "#ff4f00",
+  "accent_use": "shapes and fills only, never text on bg"
+ },
+ {
+  "id": "butter-navy",
+  "theme": "paper",
+  "bg": "#f7edc6",
+  "surface": "#efe0a8",
+  "ink": "#14213d",
+  "muted": "#4d5466",
+  "accent": "#e63946",
+  "accent_use": "large text and shapes only"
+ },
+ {
+  "id": "oat-green",
+  "theme": "paper",
+  "bg": "#ece5d3",
+  "surface": "#dfd6bf",
+  "ink": "#17201a",
+  "muted": "#555c50",
+  "accent": "#2f6f4f",
+  "accent_use": "any text"
+ },
+ {
+  "id": "riso-pink-blue",
+  "theme": "paper",
+  "bg": "#f5efe3",
+  "surface": "#ebe2d0",
+  "ink": "#1e1e1e",
+  "muted": "#5b5651",
+  "accent": "#ff48b0",
+  "accent2": "#0078bf",
+  "accent_use": "shapes and fills only, never text on bg",
+  "accent2_use": "large text and shapes only"
+ },
+ {
+  "id": "bone-cobalt-gold",
+  "theme": "paper",
+  "bg": "#efe8da",
+  "surface": "#e2d9c6",
+  "ink": "#121a3a",
+  "muted": "#4f5670",
+  "accent": "#1c3fd1",
+  "accent2": "#d4a017",
+  "accent_use": "any text",
+  "accent2_use": "shapes and fills only, never text on bg"
+ },
+ {
+  "id": "sand-terracotta",
+  "theme": "paper",
+  "bg": "#ead9c2",
+  "surface": "#dfc9ad",
+  "ink": "#2b1d14",
+  "muted": "#66533f",
+  "accent": "#b5482b",
+  "accent_use": "large text and shapes only"
+ },
+ {
+  "id": "manila-black",
+  "theme": "paper",
+  "bg": "#e8d9a8",
+  "surface": "#dccb93",
+  "ink": "#111111",
+  "muted": "#4f4a3a",
+  "accent": "#d7263d",
+  "accent_use": "large text and shapes only"
+ },
+ {
+  "id": "linen-moss",
+  "theme": "paper",
+  "bg": "#f0ebe1",
+  "surface": "#e4ddcf",
+  "ink": "#222018",
+  "muted": "#5d5a4d",
+  "accent": "#5a6b1f",
+  "accent_use": "any text"
+ },
+ {
+  "id": "klein-blue",
+  "theme": "colour",
+  "bg": "#1f2bd9",
+  "surface": "#1a24b8",
+  "ink": "#ffffff",
+  "muted": "#c9cdf7",
+  "accent": "#ffe600",
+  "accent_use": "any text"
+ },
+ {
+  "id": "tomato",
+  "theme": "colour",
+  "bg": "#ff4a1c",
+  "surface": "#e63f12",
+  "ink": "#1a0d08",
+  "muted": "#3d1a0f",
+  "accent": "#fff3e0",
+  "accent_use": "large text and shapes only"
+ },
+ {
+  "id": "acid",
+  "theme": "colour",
+  "bg": "#d4ff3a",
+  "surface": "#c3ee28",
+  "ink": "#101400",
+  "muted": "#3b4410",
+  "accent": "#2f2bd6",
+  "accent_use": "any text"
+ },
+ {
+  "id": "bubblegum",
+  "theme": "colour",
+  "bg": "#ff8fc8",
+  "surface": "#f77bbb",
+  "ink": "#1a0f1f",
+  "muted": "#4a2a45",
+  "accent": "#1f2bd9",
+  "accent_use": "large text and shapes only"
+ },
+ {
+  "id": "forest",
+  "theme": "colour",
+  "bg": "#1f4d2b",
+  "surface": "#1a4325",
+  "ink": "#f3efe0",
+  "muted": "#c5cdb9",
+  "accent": "#ffb703",
+  "accent_use": "any text"
+ },
+ {
+  "id": "oxblood",
+  "theme": "colour",
+  "bg": "#6b1020",
+  "surface": "#5c0d1b",
+  "ink": "#fbeee6",
+  "muted": "#e0b9b4",
+  "accent": "#ffcf33",
+  "accent_use": "any text"
+ },
+ {
+  "id": "teal",
+  "theme": "colour",
+  "bg": "#00756f",
+  "surface": "#006862",
+  "ink": "#f2fbf9",
+  "muted": "#f2fbf9",
+  "accent": "#ffd23f",
+  "accent_use": "large text and shapes only"
+ },
+ {
+  "id": "safety-orange",
+  "theme": "colour",
+  "bg": "#ff7a00",
+  "surface": "#f06f00",
+  "ink": "#160b00",
+  "muted": "#47280a",
+  "accent": "#ffffff",
+  "accent_use": "shapes and fills only, never text on bg"
+ },
+ {
+  "id": "lavender",
+  "theme": "colour",
+  "bg": "#b9a7ff",
+  "surface": "#a996f5",
+  "ink": "#160f33",
+  "muted": "#3d3566",
+  "accent": "#160f33",
+  "accent_use": "any text"
+ },
+ {
+  "id": "mustard",
+  "theme": "colour",
+  "bg": "#e8b00e",
+  "surface": "#d9a300",
+  "ink": "#1a1405",
+  "muted": "#4a3b10",
+  "accent": "#1c3fd1",
+  "accent_use": "large text and shapes only"
+ },
+ {
+  "id": "cobalt-pink",
+  "theme": "colour",
+  "bg": "#2445ff",
+  "surface": "#1f3be0",
+  "ink": "#ffffff",
+  "muted": "#ffffff",
+  "accent": "#ff9ad5",
+  "accent_use": "large text and shapes only"
+ },
+ {
+  "id": "signal-red",
+  "theme": "colour",
+  "bg": "#d7191c",
+  "surface": "#c4141a",
+  "ink": "#fff6ef",
+  "muted": "#fff6ef",
+  "accent": "#111111",
+  "accent_use": "large text and shapes only"
+ },
+ {
+  "id": "mint",
+  "theme": "colour",
+  "bg": "#9ff2c8",
+  "surface": "#8ae5b7",
+  "ink": "#0d2018",
+  "muted": "#2f5141",
+  "accent": "#c2185b",
+  "accent_use": "large text and shapes only"
+ },
+ {
+  "id": "sky",
+  "theme": "colour",
+  "bg": "#59b8ff",
+  "surface": "#45abf5",
+  "ink": "#071a2b",
+  "muted": "#1f3d58",
+  "accent": "#071a2b",
+  "accent_use": "any text"
+ },
+ {
+  "id": "plum",
+  "theme": "colour",
+  "bg": "#4b1d52",
+  "surface": "#401946",
+  "ink": "#fbeaf3",
+  "muted": "#d8b9d6",
+  "accent": "#ff9f1c",
+  "accent_use": "any text"
+ },
+ {
+  "id": "terracotta",
+  "theme": "colour",
+  "bg": "#9a361a",
+  "surface": "#872e15",
+  "ink": "#fff4ea",
+  "muted": "#ffd9c4",
+  "accent": "#ffd23f",
+  "accent_use": "any text"
+ },
+ {
+  "id": "ink-coral",
+  "theme": "dark",
+  "bg": "#121214",
+  "surface": "#1c1c20",
+  "ink": "#f2efe9",
+  "muted": "#a7a39b",
+  "accent": "#ff6b4a",
+  "accent_use": "any text"
+ },
+ {
+  "id": "charcoal-lime",
+  "theme": "dark",
+  "bg": "#161616",
+  "surface": "#222222",
+  "ink": "#f1f1ec",
+  "muted": "#a3a39c",
+  "accent": "#c6ff3d",
+  "accent_use": "any text"
+ },
+ {
+  "id": "espresso-cream",
+  "theme": "dark",
+  "bg": "#1e1611",
+  "surface": "#2a1f18",
+  "ink": "#f3e8d8",
+  "muted": "#b8a48f",
+  "accent": "#e8a33d",
+  "accent_use": "any text"
+ },
+ {
+  "id": "bottle-green-gold",
+  "theme": "dark",
+  "bg": "#0e1f17",
+  "surface": "#16291f",
+  "ink": "#ecefe4",
+  "muted": "#a5b3a2",
+  "accent": "#d9b44a",
+  "accent_use": "any text"
+ },
+ {
+  "id": "midnight-orange",
+  "theme": "dark",
+  "bg": "#0b1530",
+  "surface": "#13204a",
+  "ink": "#eef1fa",
+  "muted": "#9fa9c8",
+  "accent": "#ff7a1a",
+  "accent_use": "any text"
+ },
+ {
+  "id": "aubergine-pink",
+  "theme": "dark",
+  "bg": "#1d0f1e",
+  "surface": "#2a172c",
+  "ink": "#f7eaf3",
+  "muted": "#c3a6bd",
+  "accent": "#ff5fa2",
+  "accent_use": "any text"
+ },
+ {
+  "id": "oxide-red",
+  "theme": "dark",
+  "bg": "#1a0f0d",
+  "surface": "#2a1814",
+  "ink": "#f4e9e3",
+  "muted": "#bba39a",
+  "accent": "#ff3b1f",
+  "accent_use": "any text"
+ },
+ {
+  "id": "graphite-cyan",
+  "theme": "dark",
+  "bg": "#15181b",
+  "surface": "#1f2428",
+  "ink": "#e9eef1",
+  "muted": "#9aa6ad",
+  "accent": "#23d5e8",
+  "accent_use": "any text"
+ },
+ {
+  "id": "soot-red",
+  "theme": "dark",
+  "bg": "#0a0a0a",
+  "surface": "#161616",
+  "ink": "#f5f5f0",
+  "muted": "#9b9b95",
+  "accent": "#ff2a2a",
+  "accent_use": "any text"
+ },
+ {
+  "id": "deep-teal-peach",
+  "theme": "dark",
+  "bg": "#072a2c",
+  "surface": "#0d3a3c",
+  "ink": "#eaf4f1",
+  "muted": "#9dbcb8",
+  "accent": "#ffb38a",
+  "accent_use": "any text"
+ },
+ {
+  "id": "obsidian-violet",
+  "theme": "dark",
+  "bg": "#100e1a",
+  "surface": "#1a1729",
+  "ink": "#ece9f7",
+  "muted": "#a39fbd",
+  "accent": "#8f6bff",
+  "accent_use": "any text"
+ },
+ {
+  "id": "olive-night",
+  "theme": "dark",
+  "bg": "#1b1d12",
+  "surface": "#26291a",
+  "ink": "#eeeedd",
+  "muted": "#aeb095",
+  "accent": "#e9ff70",
+  "accent_use": "any text"
+ },
+ {
+  "id": "cocoa-turquoise",
+  "theme": "dark",
+  "bg": "#24160f",
+  "surface": "#33211a",
+  "ink": "#f6ece4",
+  "muted": "#bfa999",
+  "accent": "#2ec4b6",
+  "accent_use": "any text"
+ },
+ {
+  "id": "black-gold",
+  "theme": "dark",
+  "bg": "#0d0c0a",
+  "surface": "#1a1814",
+  "ink": "#efe7d6",
+  "muted": "#a89f8c",
+  "accent": "#c9a24a",
+  "accent_use": "any text"
+ }
+]

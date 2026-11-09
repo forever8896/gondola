@@ -107,3 +107,5 @@ CREATE TABLE IF NOT EXISTS warm_bases (
   photos      int  NOT NULL DEFAULT 0,
   created_at  timestamptz NOT NULL DEFAULT now()
 );
+-- A/B tests: a run that reuses another run's exact directions (admin only).
+ALTER TABLE runs ADD COLUMN IF NOT EXISTS briefs_from text;

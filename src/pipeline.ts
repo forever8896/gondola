@@ -10,14 +10,27 @@ const MODEL = process.env.MODEL ?? 'openrouter:deepseek/deepseek-v4.1-flash';
 const MAX_ACTIVE = Number(process.env.MAX_ACTIVE_SANDBOXES ?? 95);
 const AGENT_BUDGET_MS = Number(process.env.AGENT_BUDGET_MIN ?? 12) * 60_000;
 const QA_FIX_MS = 5 * 60_000;
-const ELEVATE_MS = 4 * 60_000;
-const ELEVATE_PROMPT =
-  `Elevate pass. Look at your page as an award jury would (Awwwards / Godly level) and make it more striking. ` +
-  `Re-read ~/kit/brief.json, especially signature_moment and craft_details, then check your page against the ` +
-  `"Ambition" checklist in ~/kit/AGENTS.md. Fix the weakest points: execute the signature moment at full scale in the ` +
-  `hero, push the type scale and contrast harder, give every section its own composed layout (no plain column of ` +
-  `paragraphs), add the craft details and real hover/focus states. Keep every fact exactly as in content.md and keep ` +
-  `the brief's style. Edit the existing files, then stop.`;
+const ELEVATE_MS = 6 * 60_000;
+const SHOT = (w: number, h: number, out: string) =>
+  `timeout 45 google-chrome --headless=new --no-sandbox --disable-gpu --hide-scrollbars --virtual-time-budget=6000 --window-size=${w},${h} --screenshot=${out} http://localhost:3001/ >/dev/null 2>&1`;
+// Art director pass: the designer looks at screenshots of its own page and fixes what a senior art director would.
+export const ELEVATE_PROMPT =
+  `Art director pass. First LOOK at your page: run\n` +
+  `  ${SHOT(1440, 900, '/tmp/ad-desktop.png')}; ${SHOT(390, 844, '/tmp/ad-mobile.png')}; timeout 60 node ~/.rd/qa.mjs shot http://localhost:3001/ /tmp/ad-full.jpg\n` +
+  `then open /tmp/ad-desktop.png, /tmp/ad-mobile.png and /tmp/ad-full.jpg with your file-reading tool and study them as the ` +
+  `art director of an award-winning studio would (Awwwards Site of the Day). Judge against this rubric:\n` +
+  `- Typography: one clear focal headline; a scale with real jumps; display tracking and line breaks look deliberate (no ` +
+  `orphan words, no broken words, no awkward rag); body lines 60-75 characters; only the brief's font families; labels small ` +
+  `and precise; nothing looks like default browser text.\n` +
+  `- Colour: the brief's palette roles used as specified; the background colour fills the page (not white with colour bits); ` +
+  `accent used sparingly for the one thing that matters; no stray greys or default link blue; text contrast comfortable.\n` +
+  `- Composition: a strong first screen (the signature moment at full scale); a visible grid and alignment; generous, ` +
+  `rhythmic spacing; each section has its own layout idea; images at their natural shape and well placed; nothing cramped, ` +
+  `nothing floating in empty space; the mobile screen is just as composed.\n` +
+  `- Craft: brief.craft_details executed; hover and focus states; one texture or graphic device that belongs to the style.\n` +
+  `Write the five biggest problems you SEE (most visible first) to ~/kit/critique.md, then fix all five by editing the ` +
+  `existing files. Keep every fact exactly as in content.md and keep the brief's style, fonts and palette. Re-take the ` +
+  `desktop screenshot once to confirm, then stop.`;
 // Extraction is copying, not design: always use the fast default so a slow design model doesn't stall ingest.
 const EXTRACT_MODEL = process.env.EXTRACT_MODEL ?? MODEL;
 const CURATOR_MODEL = process.env.CURATOR_MODEL ?? 'anthropic/claude-haiku-5.5';
@@ -134,6 +147,8 @@ async function prompt(model: string, sandbox: string, text: string, onAction: (a
       if (ev?.event === 'error') error = String(ev.error ?? 'error');
       const inner = ev?.data?.data;
       if (inner?.error) error = String(inner.error);
+      // A provider failure (out of credits, rate limit) comes back as the agent's reply text, not as an error event.
+      if (ev?.data?.type === 'response' && typeof inner?.content === 'string' && /^\s*API Error\b/.test(inner.content)) error = inner.content.trim().slice(0, 200);
       for (const t of inner?.tools ?? []) {
         const id = t?.use?.id;
         if (!id || seen.has(id)) continue;
@@ -181,30 +196,95 @@ async function missingParts(sb: string): Promise<string[]> {
 /** Spread N briefs across style families: first variant of every family, then the second, ... */
 const shuffle = <T>(a: T[]) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
 
+// ---------- type and colour ----------
+// Refined directions get a font pairing and a palette from curated libraries (kit/type-pairings.json, kit/palettes.json,
+// contrast-checked), so designs stop defaulting to the same mono fonts and navy-plus-neon. Wildcards (themed directions:
+// Win95, game HUD, terminal...) keep their own fonts and colours, since those are the theme; at most MAX_WILD per run.
+const TYPES: any[] = await Bun.file(KIT + 'type-pairings.json').json();
+const PALETTES: any[] = await Bun.file(KIT + 'palettes.json').json();
+const REFINED_TYPES = TYPES.filter(t => !t.mood.includes('wildcard'));
+const isWild = (b: any) => b?.tier === 'wildcard';
+const MAX_WILD = Number(process.env.MAX_WILDCARD_BRIEFS ?? 2);
+/** Wildcards allowed in a run of n: none in small runs, MAX_WILD otherwise (more only when refined directions run out). */
+const wildLimit = (n: number) => (n < 10 ? 0 : MAX_WILD);
+
+/** Background themes for a run: ~20% light, ~20% paper, ~25% colour-field, the rest dark, in random order. */
+export function themeSlots(n: number) {
+  const k = (f: number) => Math.round(n * f);
+  const slots: string[] = [...Array(k(0.2)).fill('light'), ...Array(k(0.2)).fill('paper'), ...Array(k(0.25)).fill('colour')];
+  while (slots.length < n) slots.push('dark');
+  return shuffle(slots.slice(0, n));
+}
+const paletteForBrief = (p: any) => ({
+  id: p.id, theme: p.theme, background: p.bg, surface: p.surface, text: p.ink, muted_text: p.muted,
+  accent: p.accent, accent_use: p.accent_use, ...(p.accent2 ? { accent2: p.accent2, accent2_use: p.accent2_use } : {}),
+});
+const typeForBrief = (t: any) => ({
+  pairing: t.id, display: t.display, text: t.text, ...(t.mono ? { mono: t.mono } : {}), how: t.use,
+});
+/**
+ * Give each refined brief a palette (from its theme slot) and a font pairing, preferring the curator's choices
+ * (`art`: brief_id → {palette_id, type_id}). No palette or pairing repeats within a run.
+ */
+export function applyStyle(set: any[], art = new Map<number, any>(), slots = themeSlots(set.length)) {
+  const usedP = new Set<string>(), usedT = new Set<string>();
+  return set.map((b, i) => {
+    if (isWild(b)) return b;
+    const a = art.get(b.brief_id) ?? {}, theme = slots[i] ?? 'dark';
+    const p = PALETTES.find(x => x.id === a.palette_id && x.theme === theme && !usedP.has(x.id))
+      ?? shuffle(PALETTES.filter(x => x.theme === theme && !usedP.has(x.id)))[0]
+      ?? shuffle(PALETTES.filter(x => !usedP.has(x.id)))[0] ?? shuffle(PALETTES)[0];
+    usedP.add(p.id);
+    const t = REFINED_TYPES.find(x => x.id === a.type_id && !usedT.has(x.id))
+      ?? shuffle(REFINED_TYPES.filter(x => !usedT.has(x.id)))[0] ?? shuffle(REFINED_TYPES)[0];
+    usedT.add(t.id);
+    const { typography: _t, palette: _p, library_palette: _lp, ...rest } = b;
+    return { ...rest, palette: paletteForBrief(p), typography: typeForBrief(t) };
+  });
+}
+/** Keep at most MAX_WILD wildcard briefs in a list (those already in `have` count). */
+const capWild = (list: any[], have: any[] = [], limit = MAX_WILD) => { let w = have.filter(isWild).length; return list.filter(b => !isWild(b) || w++ < limit); };
+
 /**
  * Random, family-stratified pick: one brief per style family (in random order) before any family repeats.
  * Briefs in `exclude` (already used for this site) are skipped while enough others remain.
  */
-export function pickBriefs(n: number, exclude: Set<number> = new Set(), keep: any[] = []) {
+export function pickBriefs(n: number, exclude: Set<number> = new Set(), keep: any[] = [], avoid: Set<number> = new Set()) {
   let taken = new Set(keep.map(b => b.brief_id));
   let pool = BRIEFS.filter(b => !exclude.has(b.brief_id) && !taken.has(b.brief_id));
   if (pool.length < n - keep.length) {
     // Not enough unused directions left for this site: take every unused one, then repeat older ones.
-    keep = [...keep, ...shuffle(pool)];
+    keep = [...keep, ...capWild(shuffle(pool), keep, wildLimit(n))];
     taken = new Set(keep.map(b => b.brief_id));
     pool = BRIEFS.filter(b => !taken.has(b.brief_id));
   }
   const fams = new Map<string, any[]>();
-  for (const b of shuffle(pool)) (fams.get(b.style_family) ?? fams.set(b.style_family, []).get(b.style_family)!).push(b);
+  // Directions used in the last runs on any site go last, so back-to-back runs for different people differ.
+  for (const b of shuffle(pool).sort((x, y) => Number(avoid.has(x.brief_id)) - Number(avoid.has(y.brief_id))))
+    (fams.get(b.style_family) ?? fams.set(b.style_family, []).get(b.style_family)!).push(b);
   const usedFams = new Set(keep.map(b => b.style_family));
   const order = shuffle([...fams.keys()]).sort((a, b) => Number(usedFams.has(a)) - Number(usedFams.has(b)));
   const out = [...keep];
+  let wild = out.filter(isWild).length;
   for (let round = 0; out.length < n && round < 10; round++)
-    for (const f of order) if (fams.get(f)![round] && out.length < n) out.push(fams.get(f)![round]);
+    for (const f of order) {
+      const b = fams.get(f)![round];
+      if (!b || out.length >= n || out.includes(b) || (isWild(b) && wild >= wildLimit(n))) continue;
+      out.push(b); if (isWild(b)) wild++;
+    }
+  // Big runs can need more directions than the refined ones: fill up with further wildcards.
+  if (out.length < n) for (const b of shuffle(pool)) if (out.length < n && !out.includes(b)) out.push(b);
   return out.slice(0, n);
 }
 
 /** Brief ids already used for this site (any visitor), so a repeat run shows new directions. */
+/** Brief ids from the last `runs` runs on any site: avoided where possible, so consecutive people get different sets. */
+export async function recentBriefIds(runId: string, runs = 2) {
+  const rows = await sql`SELECT DISTINCT (d.brief->>'brief_id')::int AS id FROM designs d WHERE d.brief ? 'brief_id' AND d.run_id IN
+                         (SELECT id FROM runs WHERE id <> ${runId} AND count > 0 ORDER BY created_at DESC LIMIT ${runs})`;
+  return new Set<number>(rows.map((r: any) => r.id));
+}
+
 export async function usedBriefIds(origin: string, runId: string) {
   const rows = await sql`SELECT DISTINCT (d.brief->>'brief_id')::int AS id FROM designs d JOIN runs r ON r.id = d.run_id
                          WHERE r.origin = ${origin} AND r.id <> ${runId} AND d.brief ? 'brief_id'`;
@@ -232,7 +312,7 @@ function parsePicks(text: string): any[] {
   return out;
 }
 
-export async function curateBriefs(run: any, n: number, exclude: Set<number>): Promise<any[] | null> {
+export async function curateBriefs(run: any, n: number, exclude: Set<number>, recent: Set<number> = new Set()): Promise<any[] | null> {
   const key = process.env.OPENROUTER_API_KEY;
   if (!key && !SUBSCRIPTION) return null;
   const kit = async (f: string) => {
@@ -243,10 +323,10 @@ export async function curateBriefs(run: any, n: number, exclude: Set<number>): P
   // Directions this site has never had always go in first; when there are fewer than n, the curator picks the rest
   // from the ones it has had (they come back with a new palette and hero idea).
   const fresh = BRIEFS.filter(b => !exclude.has(b.brief_id));
-  const mustInclude = fresh.length < n ? fresh : [];
+  const mustInclude = fresh.length < n ? capWild(fresh, [], wildLimit(n)) : [];
   const pool = fresh.length >= n ? fresh : BRIEFS.filter(b => exclude.has(b.brief_id));
   const need = n - mustInclude.length;
-  const library = shuffle(pool).map(b => `${b.brief_id} | ${b.style_family} | ${(b.directory_tags ?? []).map((t: string) => t.split(': ')[1]).join(', ')} | ${b.reference} | ${String(b.layout).slice(0, 100)}`).join('\n');
+  const library = shuffle(pool).map(b => `${b.brief_id} | ${b.style_family}${isWild(b) ? ' [wildcard]' : ''}${recent.has(b.brief_id) ? ' (recent)' : ''} | ${(b.directory_tags ?? []).map((t: string) => t.split(': ')[1]).join(', ')} | ${b.reference} | ${String(b.layout).slice(0, 100)}`).join('\n');
   const chat = async (prompt: string, maxTokens: number) => {
     if (SUBSCRIPTION) return parsePicks(await claudeLocal(prompt + '\nReply with the JSON object only, no prose, no code fences.'));
     const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -269,8 +349,10 @@ export async function curateBriefs(run: any, n: number, exclude: Set<number>): P
     `You are the creative director for a set of ${n} homepage redesigns of one person's or company's site. Each is built by a ` +
     `separate designer agent from one brief in the library. The bar is award-level work (Awwwards Site of the Day, Godly): ` +
     `striking, confident, memorable. Nothing safe, generic or template-like.\n\n` +
-    `Pick exactly ${need} brief ids. Rules: (1) no two picks from the same style family; (2) spread the set across dark/light, ` +
-    `type-led/image-led, loud/precise, retro/futuristic, so it feels like ${n} different studios; (3) cover as many different ` +
+    `Pick exactly ${need} brief ids. Rules: (1) no two picks from the same style family; (2) at most ${wildLimit(n)} briefs marked ` +
+    `[wildcard] (themed costumes like Win95 or game HUDs): the set must be led by refined, award-level directions (typography, ` +
+    `editorial, Swiss, poster, colour-field, art-movement); prefer briefs NOT marked (recent), which other people just had; spread ` +
+    `the set across type-led/image-led, loud/precise, retro/futuristic, so it feels like ${n} different studios; (3) cover as many different ` +
     `award-directory style categories (the tags column, from Awwwards and SiteInspire) as possible; (4) favour directions that ` +
     `can be spectacular for THIS person's story; (5) nothing may resemble the current site.\n\n` +
     (mustInclude.length ? `These ${mustInclude.length} are already in the set; complement them and avoid their families: ${mustInclude.map(b => b.style_family).join(', ')}.\n\n` : '') +
@@ -283,12 +365,14 @@ export async function curateBriefs(run: any, n: number, exclude: Set<number>): P
     for (const p of need > 0 ? await chat(choose, 4000) : []) {
       const b = byId.get(Number(p?.id));
       if (!b || chosen.some(c => c.brief_id === b.brief_id) || fams.has(b.style_family)) continue;
+      if (isWild(b) && chosen.filter(isWild).length >= wildLimit(n)) continue;
       chosen.push({ ...b, why: clip(p.why, 120) });
       fams.add(b.style_family);
       if (chosen.length === n) break;
     }
     if (chosen.length < Math.ceil(n / 2)) return null;
-    const set = pickBriefs(n, exclude, chosen);   // top up if the model returned too few
+    const set = pickBriefs(n, exclude, chosen, recent);   // top up if the model returned too few
+    const slots = themeSlots(set.length);
 
     // Stage 2: art direction, written in parallel chunks of 10 (small replies, faster overall).
     const chunks: any[][] = [];
@@ -297,33 +381,36 @@ export async function curateBriefs(run: any, n: number, exclude: Set<number>): P
       const direct =
         `You are the creative director for redesigns of this site. For each brief below, write the art direction its ` +
         `designer will execute. The bar is award-level, unforgettable work.\n\n` +
-        `Colour must be WILD: give every brief its own bold palette, saturated, unexpected and high-contrast (e.g. acid lime ` +
-        `on oxblood, ultramarine with safety orange, hot pink on forest green, cobalt and lemon on black). Never reuse or echo ` +
-        `the current site's colours; no two palettes alike. This is batch ${ci + 1} of ${chunks.length}: ` +
-        `${['lean into warm and acid hues', 'lean into deep blues, teals and electric accents', 'lean into pinks, reds and fluorescents', 'lean into greens, golds and earth with one shock colour', 'lean into black, white and one violent accent'][ci % 5]}.\n\n` +
+        `Colour and type come from curated libraries, so the set looks designed, not random. Each brief below has a background ` +
+        `THEME already assigned (light, paper, colour = a saturated colour-field background, dark). For each refined brief pick ` +
+        `the palette from that theme that best suits the style and this person, and the font pairing whose mood fits the ` +
+        `style. Never the current site's colours; never the same palette or pairing twice in this batch. Briefs marked ` +
+        `[wildcard] keep their own themed palette and fonts: use null for both.\n\n` +
         `For each brief return:\n` +
-        `- "palette": 3-5 hex colours with roles, e.g. "#0b3d2e bg, #ff3cac accent, #f4ff52 highlight, #ffffff text" (max 15 words), suited to the style.\n` +
+        `- "palette_id": a palette id from the library below, of the brief's theme (null for wildcards).\n` +
+        `- "type_id": a font pairing id from the library below (null for wildcards).\n` +
         `- "signature_moment": ONE concrete hero concept for this person in this style (max 30 words), naming the actual words or ` +
         `facts from the content it stages. Specificity wanted: "The headline is a departures board: each of her 5 ventures flips ` +
         `in as a destination row, the current one blinking BOARDING."\n` +
         `- "craft_details": three concrete craft touches, max 10 words each.\n` +
         `Use only facts from the content.\n\n` + context +
-        `## Briefs\n${chunk.map(b => `${b.brief_id} | ${b.style_family} | ${b.reference} | ${String(b.layout).slice(0, 120)}`).join('\n')}\n\n` +
-        `Output only JSON: {"picks": [{"id": <number>, "palette": "...", "signature_moment": "...", "craft_details": ["...", "...", "..."]}]}`;
+        `## Briefs (id | family | in the spirit of | layout | theme)\n${chunk.map(b => `${b.brief_id} | ${b.style_family} | ${b.reference} | ${String(b.layout).slice(0, 120)} | ${isWild(b) ? '[wildcard]' : slots[set.indexOf(b)]}`).join('\n')}\n\n` +
+        `## Palettes (id | theme | background, text, accent)\n${PALETTES.map(p => `${p.id} | ${p.theme} | ${p.bg}, ${p.ink}, ${p.accent}${p.accent2 ? ' + ' + p.accent2 : ''}`).join('\n')}\n\n` +
+        `## Font pairings (id | display + text | mood)\n${REFINED_TYPES.map(t => `${t.id} | ${t.display} + ${t.text} | ${t.mood.join(', ')}`).join('\n')}\n\n` +
+        `Output only JSON: {"picks": [{"id": <number>, "palette_id": "...", "type_id": "...", "signature_moment": "...", "craft_details": ["...", "...", "..."]}]}`;
       try { return await chat(direct, 4000); } catch (e: any) { console.error('curator chunk failed:', String(e?.message ?? e).slice(0, 160)); return []; }
     }));
     const art = new Map<number, any>();
     for (const p of directed.flat()) if (p && Number.isFinite(Number(p.id))) art.set(Number(p.id), p);
-    return set.map(b => {
+    const directedSet = set.map(b => {
       const p = art.get(b.brief_id);
       if (!p) return b;
       return {
         ...b, signature_moment: clip(p.signature_moment, 400),
-        // The curator's wild palette replaces the brief's default; the original stays as a fallback reference.
-        ...(clip(p.palette, 200) && /#[0-9a-f]{3,8}/i.test(p.palette) ? { palette: clip(p.palette, 200), library_palette: b.palette } : {}),
         craft_details: Array.isArray(p.craft_details) ? p.craft_details.map((x: unknown) => clip(x, 160)).filter(Boolean).slice(0, 4) : undefined,
       };
     });
+    return applyStyle(directedSet, art, slots);
   } catch (e: any) { console.error('curator failed:', String(e?.message ?? e).slice(0, 300)); return null; }
 }
 
@@ -658,8 +745,22 @@ async function buildDesign(run: any, base: string, d: any, photos: number, curat
     // One slow agent holds up the whole run, so cap each one; whatever it wrote by then is captured.
     const deadline = Date.now() + AGENT_BUDGET_MS;
 
+    // Each pass reports its tool calls, time and how it ended, so a pass that silently does nothing shows up.
+    const pass = async (label: string, text: string, until: number) => {
+      const c0 = calls, t0 = Date.now();
+      const r = await agentTurn(run, d, sb, text, onAction, until);
+      // The agent's closing words: the content of the last response event in Boat's JSON stream.
+      let said = '';
+      for (const l of String(r?.out ?? '').split('\n')) {
+        try { const ev = JSON.parse(l); const c = ev?.data?.data?.content; if (ev?.data?.type === 'response' && typeof c === 'string' && c.trim()) said = c.trim(); } catch {}
+      }
+      await log(run.id, d.n, `${label}: ${calls - c0} tool calls in ${Math.round((Date.now() - t0) / 1000)}s` +
+        `${r?.error ? `, error: ${r.error}` : r ? '' : ', skipped (no time left)'}${said ? ` · "${said.replace(/\s+/g, ' ').slice(0, 180)}"` : ''}`);
+      return r;
+    };
+
     // 1. Build.
-    await agentTurn(run, d, sb, AGENT_PROMPT(d.n), onAction, deadline);
+    await pass('build', AGENT_PROMPT(d.n), deadline);
 
     // 2. Complete: an interrupted or lazy turn can leave the page without CSS or design.json.
     for (let i = 0; i < 2; i++) {
@@ -672,7 +773,7 @@ async function buildDesign(run: any, base: string, d: any, photos: number, curat
     // 3. Elevate: a second, critical pass that pushes the page from correct to striking.
     if (!(await missingParts(sb)).length && deadline - Date.now() > 120_000) {
       await setDesign(d.id, { last_action: 'elevate pass' });
-      await agentTurn(run, d, sb, ELEVATE_PROMPT, onAction, Math.min(deadline, Date.now() + ELEVATE_MS));
+      await pass('art director', ELEVATE_PROMPT, Math.min(deadline, Date.now() + ELEVATE_MS));
     }
     await sql`UPDATE designs SET tool_calls = ${calls} WHERE id = ${d.id}`;
 
@@ -796,7 +897,10 @@ async function executeRun(run: any) {
   let base: string | null = null;
   try {
     const used = await usedBriefIds(run.origin, run.id);
-    const briefs = pickBriefs(run.count, used);
+    const recent = await recentBriefIds(run.id);
+    // A/B tests (admin): reuse the exact directions of an earlier run, curator skipped, so only the model differs.
+    const copied = run.briefs_from ? (await sql`SELECT brief FROM designs WHERE run_id = ${run.briefs_from} ORDER BY n LIMIT ${run.count}`).map((r: any) => r.brief) : [];
+    const briefs = copied.length ? copied : applyStyle(pickBriefs(run.count, used, [], recent));
     for (let i = 0; i < briefs.length; i++) {
       await sql`INSERT INTO designs (run_id, n, token, brief) VALUES (${run.id}, ${i + 1}, ${randomId(16)}, ${JSON.stringify(briefs[i])}::text::jsonb)
                 ON CONFLICT (run_id, n) DO NOTHING`;
@@ -815,14 +919,14 @@ async function executeRun(run: any) {
 
     // The curator chooses the directions while the sandboxes start; each design waits for it only when needed.
     await setRun(run.id, { status: 'building', phase_note: `forking ${run.count} sandboxes · choosing ${run.count} design directions` });
-    const curated = curateBriefs(run, run.count, used).then(async picks => {
+    const curated = (copied.length ? Promise.resolve(null) : curateBriefs(run, run.count, used, recent)).then(async picks => {
       if (picks) {
         for (let i = 0; i < picks.length; i++) {
           const [d] = await sql`UPDATE designs SET brief = ${JSON.stringify(picks[i])}::text::jsonb WHERE run_id = ${run.id} AND n = ${i + 1} RETURNING *`;
           if (d) emit(run.id, 'design', publicDesign(d));
         }
         await log(run.id, null, `picked ${picks.length} directions for this site${used.size ? ` (skipping ${used.size} used before)` : ''}`);
-      } else await log(run.id, null, 'using a random spread of directions');
+      } else await log(run.id, null, copied.length ? `using the directions of run ${run.briefs_from}` : 'using a random spread of directions');
       return picks;
     }).catch(() => null);
     const designs = await sql`SELECT * FROM designs WHERE run_id = ${run.id} ORDER BY n`;

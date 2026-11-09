@@ -15,6 +15,7 @@ const MODEL_ALLOW = new Set([
   'openrouter:deepseek/deepseek-v4.1-flash', 'openrouter:xiaomi/mimo-v2.6-pro', 'openrouter:google/gemini-3.8-flash',
   'openrouter:google/gemini-3.7-flash', 'openrouter:anthropic/claude-haiku-5.5', 'openrouter:z-ai/glm-5.3',
   'openrouter:z-ai/glm-5.3-flash', 'openrouter:minimax/minimax-m3', 'openrouter:openai/gpt-6-luna',
+  'claude-haiku-5-5', 'claude-sonnet-5-5',
 ]);
 const PUBLIC = new URL('../public/', import.meta.url).pathname;
 if (!SECRET || SECRET.length < 32) throw new Error('SESSION_SECRET missing');
@@ -139,7 +140,13 @@ Bun.serve({
         if (process.env.ALLOW_MODEL_OVERRIDE !== '1' || !MODEL_ALLOW.has(String(body.model))) return json({ error: 'model not allowed' }, 400);
         model = String(body.model);
       }
-      const started = await startRun({ sid, admin, url: u, count, model });
+      // A/B tests (admin + ALLOW_MODEL_OVERRIDE): reuse another run's exact directions.
+      let briefsFrom: string | null = null;
+      if (body.briefs_from != null) {
+        if (!admin || process.env.ALLOW_MODEL_OVERRIDE !== '1' || !/^[A-Za-z0-9_-]{22}$/.test(String(body.briefs_from))) return json({ error: 'briefs_from not allowed' }, 400);
+        briefsFrom = String(body.briefs_from);
+      }
+      const started = await startRun({ sid, admin, url: u, count, model, briefsFrom });
       if (!started.ok) return json({ error: started.error }, started.status);
       return json({ id: started.id }, 201);
     }

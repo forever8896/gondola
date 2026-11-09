@@ -69,7 +69,8 @@
   "directory_tags": [
    "Awwwards: Retro",
    "Awwwards: Microinteractions"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 6,
@@ -187,7 +188,8 @@
   "directory_tags": [
    "Awwwards: Retro",
    "Awwwards: Unusual Navigation"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 14,
@@ -202,7 +204,8 @@
   "directory_tags": [
    "Awwwards: Retro",
    "Awwwards: 3D"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 15,
@@ -289,7 +292,8 @@
   "directory_tags": [
    "Awwwards: Colorful",
    "Awwwards: Illustration"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 21,
@@ -334,7 +338,8 @@
   "directory_tags": [
    "Awwwards: Graphic design",
    "SiteInspire: Unusual Layout"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 24,
@@ -349,7 +354,8 @@
   "directory_tags": [
    "Awwwards: Data Visualization",
    "Awwwards: Infinite Scroll"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 25,
@@ -364,7 +370,8 @@
   "directory_tags": [
    "Awwwards: Retro",
    "Awwwards: Gestures / Interaction"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 26,
@@ -436,7 +443,8 @@
   "directory_tags": [
    "SiteInspire: Unusual Layout",
    "Awwwards: Data Visualization"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 31,
@@ -466,7 +474,8 @@
   "directory_tags": [
    "Awwwards: Retro",
    "Awwwards: Colorful"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 33,
@@ -525,7 +534,8 @@
   "directory_tags": [
    "SiteInspire: Unusual Layout",
    "Awwwards: Vector"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 37,
@@ -552,7 +562,8 @@
   "directory_tags": [
    "Awwwards: Filters and Effects",
    "Awwwards: Typography"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 39,
@@ -603,7 +614,8 @@
   "directory_tags": [
    "Awwwards: Illustration",
    "Awwwards: Storytelling"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 43,
@@ -657,7 +669,8 @@
   "directory_tags": [
    "Awwwards: Retro",
    "Awwwards: Filters and Effects"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 47,
@@ -672,7 +685,8 @@
   "directory_tags": [
    "Awwwards: Retro",
    "Awwwards: Gestures / Interaction"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 48,
@@ -729,7 +743,8 @@
   "directory_tags": [
    "Awwwards: Filters and Effects",
    "Awwwards: 3D"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 52,
@@ -768,7 +783,8 @@
   "directory_tags": [
    "Awwwards: Illustration",
    "Awwwards: Vector"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 55,
@@ -783,7 +799,8 @@
   "directory_tags": [
    "Awwwards: Flat Design",
    "Awwwards: Horizontal Layout"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 56,
@@ -798,7 +815,8 @@
   "directory_tags": [
    "Awwwards: Video",
    "Awwwards: Transitions"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 57,
@@ -825,7 +843,8 @@
   "directory_tags": [
    "SiteInspire: Unusual Layout",
    "Awwwards: Microinteractions"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 59,
@@ -840,7 +859,8 @@
   "directory_tags": [
    "Awwwards: Illustration",
    "Awwwards: Gallery"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 60,
@@ -855,7 +875,8 @@
   "directory_tags": [
    "Awwwards: 3D",
    "Awwwards: Microinteractions"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 61,
@@ -897,7 +918,8 @@
   "directory_tags": [
    "Awwwards: Filters and Effects",
    "Awwwards: Experimental"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 64,
@@ -927,7 +949,8 @@
   "directory_tags": [
    "Awwwards: Illustration",
    "Awwwards: Vector"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 66,
@@ -942,7 +965,8 @@
   "directory_tags": [
    "Awwwards: Retro",
    "Awwwards: 3D"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 67,
@@ -972,7 +996,8 @@
   "directory_tags": [
    "Awwwards: Retro",
    "Awwwards: Typography"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 69,
@@ -987,7 +1012,8 @@
   "directory_tags": [
    "Awwwards: Retro",
    "Awwwards: Parallax"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 70,
@@ -1017,7 +1043,8 @@
   "directory_tags": [
    "Awwwards: Colorful",
    "Awwwards: Illustration"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 72,
@@ -1032,7 +1059,8 @@
   "directory_tags": [
    "Awwwards: Typography",
    "Awwwards: Retro"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 73,
@@ -1047,7 +1075,8 @@
   "directory_tags": [
    "Awwwards: Vector",
    "Awwwards: Transitions"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 74,
@@ -1062,7 +1091,8 @@
   "directory_tags": [
    "Awwwards: Colorful",
    "Awwwards: Experimental"
-  ]
+  ],
+  "tier": "wildcard"
  },
  {
   "brief_id": 75,
@@ -1242,7 +1272,8 @@
   "layout": "scenes built from flat SVG shapes (no gradients, no shadows): the hero is a simple vector scene that illustrates a fact from content",
   "motion": "gentle shape bobbing",
   "density": "medium",
-  "hard_constraint": "all decoration is flat inline SVG; no gradients or shadows"
+  "hard_constraint": "all decoration is flat inline SVG; no gradients or shadows",
+  "tier": "wildcard"
  },
  {
   "brief_id": 87,
@@ -1318,7 +1349,8 @@
   "layout": "poster panels with flat retro illustration in SVG (sun rays, hills, simple icons), slab-serif headlines",
   "motion": "none",
   "density": "medium",
-  "hard_constraint": "each section is a framed poster panel with an SVG illustration"
+  "hard_constraint": "each section is a framed poster panel with an SVG illustration",
+  "tier": "wildcard"
  },
  {
   "brief_id": 92,

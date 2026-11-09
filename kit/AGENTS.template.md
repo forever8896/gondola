@@ -12,13 +12,13 @@ Your style is fixed by `~/kit/brief.json`. Follow it literally. Your job is to l
   placing any image.
 - `~/kit/original-style.md` — the current site's palette, fonts and layout, measured in a browser. Your design must be
   clearly different from it: different background colour family, different fonts, different hero composition.
-  Never reuse its colours. Use the `palette` in your brief exactly, and use it boldly (large colour fields, not
-  just an accent on white).
+  Never reuse its colours.
 
 ## Output
 - Write the finished homepage to `~/redesign/index.html` (plus optional `~/redesign/style.css`, `~/redesign/main.js`).
 - Static HTML + CSS + optional vanilla JS only. No npm, no build step, no frameworks, no Tailwind CDN.
-- Google Fonts `<link>` is allowed. Pick fonts that fit the brief; Inter / Roboto / Arial are banned unless the brief names them.
+- Google Fonts `<link>` is allowed (css2 API; request only weights and axes the family has). Use exactly the fonts in
+  `brief.typography`. Inter / Roboto / Arial are banned unless the brief names them.
 - Never reference files outside `~/redesign/` and never hotlink images from other domains; use `assets/...` only.
 - A local server already serves `~/redesign` on port 3001. Do not start another one.
 - Finish by writing `~/redesign/design.json`:
@@ -40,6 +40,32 @@ Your style is fixed by `~/kit/brief.json`. Follow it literally. Your job is to l
 - Show each image within about 15% of its natural aspect ratio (see media.md). Never `object-fit: fill` an image into
   a different shape. If you need a different shape, change the layout, not the image.
 - Never put text on top of a photo, and never cover or crop text that is printed inside an image.
+
+## Typography (most of what makes a page look designed)
+`brief.typography` gives your pairing: `display` for headlines, `text` for everything you read, optional `mono` for tiny
+labels only, and `how` to use them. (Wildcard briefs describe their fonts in prose instead; follow that.)
+- Exactly these families. Never add a third family, never use the mono for paragraphs, buttons or navigation.
+- A real scale with contrast: hero display 9-16vw (clamp), section titles about 3-5rem, body 17-19px desktop / 16-17px
+  mobile, labels 11-13px. Few sizes, big jumps between them, nothing "medium".
+- Body copy at 60-75 characters per line (max-width in ch), line-height 1.45-1.65. Display line-height 0.9-1.05.
+- Track it: display tight (-0.01 to -0.04em), uppercase labels wide (+0.06 to +0.14em), body untouched.
+- Weight contrast: pair a heavy or very light display with a regular text weight; use italic or a second weight for
+  emphasis, not colour alone.
+- Rag and orphans: break hero lines by hand where it reads best (`<br>` or spans), `text-wrap: balance` on titles,
+  `text-wrap: pretty` on paragraphs; no single-word last lines in headlines. Never break a word in a headline.
+- Numbers in tables, dates and stats use `font-variant-numeric: tabular-nums`; use real typographic quotes and dashes.
+
+## Colour (bold, but composed)
+`brief.palette` has roles: `background`, `surface` (panels, cards), `text`, `muted_text`, `accent`, optional `accent2`.
+- The background colour IS the page: fill whole sections with it (and with `surface`), never a white page with
+  coloured details. Colour-field themes mean the saturated colour covers most of the screen.
+- Text in `text`; secondary text in `muted_text`; nothing else for words. Respect `accent_use`: "large text and shapes
+  only" means never small text in that colour, "shapes and fills only" means no text in it at all.
+- Proportion about 60/30/10: background, surface plus text, accent. The accent marks the one thing per screen that
+  matters (a key word, the main button, a rule, a numeral), not everything.
+- No other colours: no extra greys, no default blue links, no gradients the palette doesn't imply (a subtle tint of
+  the background is fine). Images may be shown as they are, or treated per `image_treatment`.
+- Wildcard briefs bring their own colours in prose; follow those instead.
 
 ## Ambition (the bar)
 This is a showcase. Every page must look like award-level work (Awwwards Site of the Day, Godly), never like a
