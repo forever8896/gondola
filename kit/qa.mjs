@@ -112,6 +112,20 @@ const SCROLL = `(async () => { ${HELPERS}
     if (/auto|scroll/.test(cs.overflowX) && a.scrollWidth > a.clientWidth + 4) return true;
     if (cs.animationName && cs.animationName !== 'none' && /translate|matrix/.test(cs.transform + (a.getAnimations?.().length ? 'translate' : ''))) return true;
   } return false; };
+  // Does this element visibly paint at (x, y)? Images and shapes, a non-transparent background, or its own glyphs there.
+  const paintsAt = (el, x, y) => {
+    const cs = getComputedStyle(el);
+    if (cs.visibility === 'hidden' || parseFloat(cs.opacity) < 0.2) return false;
+    if (/^(img|svg|video|canvas|path|circle|rect|polygon|ellipse|line|text)$/i.test(el.tagName)) return true;
+    if (!/rgba\(0, 0, 0, 0\)|transparent/.test(cs.backgroundColor) || cs.backgroundImage !== 'none') return true;
+    for (const n of el.childNodes) if (n.nodeType === 3 && n.textContent.trim()) {
+      const rg = document.createRange(); rg.selectNodeContents(n);
+      for (const rr of rg.getClientRects()) if (x >= rr.left && x <= rr.right && y >= rr.top && y <= rr.bottom) return true;
+    }
+    return false;
+  };
+  const inHeader = el => { for (let a = el; a && a !== document.body; a = a.parentElement) { const cs = getComputedStyle(a);
+    if (/sticky|fixed/.test(cs.position)) { const r = a.getBoundingClientRect(); if (r.height < 160 && (r.top <= 4 || r.bottom >= innerHeight - 4)) return true; } } return false; };
   const isHeader = (e, r) => r.top <= 2 && r.height < 140 && r.width > vw * 0.6;   // ordinary site header bar
   const opacityOf = e => { let o = 1; for (let a = e; a && a !== document.documentElement; a = a.parentElement) { const s = getComputedStyle(a); o *= parseFloat(s.opacity); if (s.visibility === 'hidden') return 0; } return o; };
   const steps = Math.min(14, Math.max(2, Math.ceil(H() / (vh * 0.75))));
@@ -142,6 +156,38 @@ const SCROLL = `(async () => { ${HELPERS}
       }
       const sec = h.closest('section, header, footer, article');
       if (sec) { const sr = sec.getBoundingClientRect(); if (t.bottom > sr.bottom + 6 || t.right > sr.right + 6) add('spill:' + short(h), 'title "' + short(h) + '" spills outside its section into the next one'); }
+    }
+    // text covered by something painted on top of it (decorative numerals, shapes, images...). Decorations usually have
+    // pointer-events: none, which also hides them from elementFromPoint, so make everything hit-testable for this test.
+    const pe = document.createElement('style'); pe.textContent = '* { pointer-events: auto !important; }'; document.head.append(pe);
+    for (const e of [...document.querySelectorAll('h1,h2,h3,p')].slice(0, 120)) {
+      if (!e.innerText?.trim()) continue;
+      const r = e.getBoundingClientRect(); if (!r.width || r.top < 0 || r.bottom > vh) continue;
+      const range = document.createRange(); range.selectNodeContents(e);
+      const lines = [...range.getClientRects()].filter(l => l.width > 4).slice(0, 4);
+      let hits = 0, by = null;
+      for (const l of lines) {
+        const x = l.left + l.width / 2, y = l.top + l.height / 2;
+        // walk down the paint stack at this point until we reach the text itself; count only things that visibly paint
+        for (const el of document.elementsFromPoint(x, y)) {
+          if (e.contains(el) || el.contains(e)) break;
+          if (inHeader(el)) continue;   // content scrolling under a sticky/fixed header bar is normal
+          if (paintsAt(el, x, y)) { hits++; by = el; break; }
+        }
+      }
+      if (lines.length && hits >= Math.ceil(lines.length / 2)) add('cover-text:' + short(e), '"' + short(e) + '" is covered by another element on top of it (' + (by.tagName.toLowerCase() + (typeof by.className === 'string' && by.className ? '.' + by.className.split(' ')[0] : '')) + '); move decorations behind the text or out of its way');
+    }
+    pe.remove();
+    // lines of one headline colliding (line-height too tight for the font)
+    for (const h of [...document.querySelectorAll('h1,h2,h3')].slice(0, 60)) {
+      const r = h.getBoundingClientRect(); if (!r.width || r.bottom < 0 || r.top > vh) continue;
+      const range = document.createRange(); range.selectNodeContents(h);
+      const ls = [...range.getClientRects()].filter(l => l.width > 4).sort((a, b) => a.top - b.top);
+      const fs = parseFloat(getComputedStyle(h).fontSize);
+      const tops = [...new Set(ls.map(l => Math.round(l.top)))];
+      if (tops.length < 2) continue;
+      const lh = parseFloat(getComputedStyle(h).lineHeight) || fs * 1.2;
+      if (lh / fs < 0.9) add('collide:' + short(h), 'the lines of "' + short(h) + '" collide (line-height ' + (lh / fs).toFixed(2) + '); use at least 0.95, more for fonts with tall ascenders or accents');
     }
     // sticky / fixed elements
     for (const st of stickies) {
@@ -216,6 +262,15 @@ try {
     await send('Page.navigate', { url });
     await Promise.race([loaded, sleep(15000)]);
     await sleep(1500);
+    // Lazy images only load when scrolled to: make them eager, scroll through the page, wait for every image.
+    await send('Runtime.evaluate', { awaitPromise: true, expression: `(async () => {
+      document.querySelectorAll('img[loading=lazy]').forEach(i => { i.loading = 'eager'; });
+      const wait = ms => new Promise(r => setTimeout(r, ms));
+      const H = document.documentElement.scrollHeight;
+      for (let y = 0; y < H; y += innerHeight * 0.8) { scrollTo(0, y); await wait(120); }
+      await Promise.race([Promise.all([...document.images].map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; }))), wait(8000)]);
+      scrollTo(0, 0); await wait(500);
+    })()` });
     const metrics = await send('Page.getLayoutMetrics');
     const h = Math.min(9000, Math.ceil(metrics.result?.cssContentSize?.height ?? metrics.result?.contentSize?.height ?? 900));
     const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 72, captureBeyondViewport: true, clip: { x: 0, y: 0, width: 1440, height: h, scale: 0.5 } });

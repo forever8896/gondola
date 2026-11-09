@@ -65,6 +65,9 @@ template or a document. Checklist:
   (overflow-wrap: anywhere; never white-space: nowrap or fixed widths on them). A title never leaves its section and never
   overlaps body text. Sticky or fixed elements are shorter than the screen and never cover text; on phones prefer no
   sticky at all. A scroll test (desktop and 390px) runs after you finish and sends back anything that breaks.
+- Decorations (big numerals, shapes, images, outlines) sit behind text or beside it, never on top of words. Display
+  type needs line-height of at least 0.95 (1.05+ for fonts with tall ascenders) so its lines never collide.
+- Images may use loading="lazy" below the fold, but always give them width and height attributes.
 - All content must be VISIBLE WITHOUT JS and without scroll-triggered reveals (pages get screenshotted headless).
 - Avoid the default AI look: no purple/blue glow gradients, no centred-hero-over-mesh, no three identical
   feature cards, no glassmorphism unless the brief asks, no emoji as icons, and do not default to
