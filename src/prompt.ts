@@ -15,7 +15,7 @@ export function claudePrompt(run: any, d: any, files: string[], base: string) {
     ``,
     `## Reference files`,
     `Download these with curl, not WebFetch: you need the exact markup and CSS, not a summary.`,
-    ...files.map(f => `  curl -s ${base}${f}`),
+    ...files.map(f => `  curl -sL ${base}${f}`),
     `Images it uses are under ${base}assets/... and are the same images my site already has.`,
     ``,
     `## The direction it was built from`,
