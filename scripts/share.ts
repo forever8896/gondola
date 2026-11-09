@@ -97,7 +97,9 @@ async function publish(arg: string, skip: number[]) {
         await put(join(dir, 'p', String(d.n), 'embed.html'), /<\/body>/i.test(html) ? html.replace(/<\/body>(?![\s\S]*<\/body>)/i, tag + '</body>') : html + tag);
         // The standalone page gets a link preview of its own.
         const og = [`<meta property="og:title" content="${esc(title)}">`, `<meta property="og:description" content="Made by Gondola: 50 AI designers redesign a site at once.">`,
-          `<meta property="og:image" content="${ORIGIN}${base}data/designs/${d.n}/desktop.png">`, `<meta name="twitter:card" content="summary_large_image">`].join('');
+          `<meta property="og:image" content="${ORIGIN}${base}data/designs/${d.n}/desktop.png">`, `<meta name="twitter:card" content="summary_large_image">`,
+          `<meta name="twitter:title" content="${esc(title)}">`, `<meta name="twitter:description" content="Made by Gondola: 50 AI designers redesign a site at once.">`,
+          `<meta name="twitter:image" content="${ORIGIN}${base}data/designs/${d.n}/desktop.png">`].join('');
         body = /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, m => m + og) : og + html;
       }
       await put(join(dir, 'p', String(d.n), f.path), body);
@@ -127,8 +129,12 @@ async function publish(arg: string, skip: number[]) {
       `<meta name="robots" content="noindex">`,
       `<meta property="og:title" content="${n} redesigns of ${esc(site)}">`,
       `<meta property="og:description" content="Made by ${n} AI designers at once with Gondola. Pick a favorite and copy it into Claude Code.">`,
-      `<meta property="og:image" content="${shareUrl}og.jpg">`, `<meta property="og:image:width" content="2400">`, `<meta property="og:image:height" content="1260">`,
+      `<meta property="og:image" content="${shareUrl}og.jpg">`, `<meta property="og:image:width" content="1200">`, `<meta property="og:image:height" content="630">`,
+      `<meta property="og:image:type" content="image/jpeg">`, `<meta property="og:type" content="website">`,
       `<meta property="og:url" content="${shareUrl}">`, `<meta name="twitter:card" content="summary_large_image">`, `<meta name="twitter:image" content="${shareUrl}og.jpg">`,
+      `<meta name="twitter:image:alt" content="A wall of ${n} AI redesigns of ${esc(site)}">`,
+      `<meta name="twitter:title" content="${n} redesigns of ${esc(site)}">`,
+      `<meta name="twitter:description" content="Made by ${n} AI designers at once with Gondola. Pick a favorite and copy it into Claude Code.">`,
     ].join('\n'))
     .replace('<button class="gridtoggle"', `<div class="sharebar"><a class="btn dark" id="sh-x" target="_blank" rel="noopener" href="https://x.com/intent/post?text=${encodeURIComponent(tweet)}&url=${encodeURIComponent(shareUrl)}">Share on X</a><button class="btn" id="sh-copy" type="button">Copy link</button></div>\n  <button class="gridtoggle"`)
     .replace('<script src="/static/rd.js"></script>', [
@@ -188,7 +194,8 @@ p{font-size:20px;line-height:1.38;color:#555;margin:0}
   if (!existsSync(join(dir, 'og.png'))) throw new Error('preview image failed to render');
   // JPEG keeps the card small; fall back to the PNG when ImageMagick isn't installed.
   const mk = Bun.which('magick') ?? Bun.which('convert');
-  if (mk) { const c = Bun.spawn([mk, join(dir, 'og.png'), '-quality', '88', join(dir, 'og.jpg')]); await c.exited; await rm(join(dir, 'og.png'), { force: true }); }
+  // Rendered at 2x for sharpness, shipped at X's recommended 1200x630 (oversized card images can be dropped).
+  if (mk) { const c = Bun.spawn([mk, join(dir, 'og.png'), '-resize', '1200x630', '-quality', '86', join(dir, 'og.jpg')]); await c.exited; await rm(join(dir, 'og.png'), { force: true }); }
   else await cp(join(dir, 'og.png'), join(dir, 'og.jpg'));
 }
 
