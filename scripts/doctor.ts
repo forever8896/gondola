@@ -52,9 +52,9 @@ if (SUBSCRIPTION) {
   // Agents run Claude Code in the sandboxes on the Claude sign-in stored in your Boat profile.
   if (creds.some(c => /claude|anthropic/i.test(c))) ok(`Boat: Claude credentials in your default AI profile (${creds.filter(c => /claude|anthropic/i.test(c)).join(', ')})`);
   else bad("Boat: no Claude sign-in in your default AI profile. Connect your Claude account in the Boat dashboard (boat dashboard → AI credentials)");
-  // With an OpenRouter key in the same profile, Boat bills the sandbox agents to OpenRouter, not the Claude sign-in
-  // (seen 2026-11-09: agents failed with OpenRouter's "exceed your available credits" while in subscription mode).
-  if (creds.includes('openrouter-api-key')) bad('Boat: your default AI profile also has an OpenRouter key, so the agents spend OpenRouter credit instead of your Claude subscription. Remove it: boat ai profile rm-key default openrouter-api-key');
+  // Boat gives Claude Code only the credential SELECTED in the profile, and the CLI doesn't show which one that is. With an
+  // OpenRouter key also present it can be the OpenRouter key (seen 2026-11-09: ~$19 of agent usage went to OpenRouter).
+  if (creds.includes('openrouter-api-key')) warn('Boat: your AI profile also has an OpenRouter key. Boat uses whichever Claude Code credential is selected in the dashboard (Agents & Proxying); make sure it is your Claude subscription, or remove the key: boat ai profile rm-key default openrouter-api-key');
   try { await claudeLocal('Reply with the word OK.', { timeoutMs: 90_000 }); ok('Local Claude Code CLI works (curator and image descriptions use your subscription)'); }
   catch (e: any) { bad(`Local Claude Code CLI failed: ${String(e?.message ?? e).slice(0, 120)}. Install Claude Code and sign in (claude)`); }
 } else if (creds.includes('openrouter-api-key')) ok("Boat: OpenRouter key is in your default AI profile (the agents can reach models)");

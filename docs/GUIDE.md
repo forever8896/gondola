@@ -38,7 +38,7 @@ Subscriptions have usage limits, and a run starts many Claude Code sessions at o
 designs) are more reliable than 50. Use it with your own account for your own sites; follow Anthropic's terms for
 your plan. A Gondola hosted for other people should use API keys.
 
-**Subscription mode:** your Boat AI profile must hold only the Claude sign-in. If it also has an OpenRouter key, Boat bills the sandbox agents to OpenRouter instead (`bun run doctor` checks this; remove it with `boat ai profile rm-key default openrouter-api-key`).
+**Subscription mode:** Boat gives Claude Code the one credential *selected* in your AI profile (dashboard → Agents & Proxying). If your profile also has an OpenRouter key, check that the Claude subscription is the selected one, or the agents bill OpenRouter instead; the CLI doesn't show the selection (`bun run doctor` warns; `boat ai profile rm-key default openrouter-api-key` removes the key).
 
 ## Where the design directions come from
 
