@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gondola</title>
+<meta name="description" content="Gondola: enter a domain and watch 25 AI designers redesign the site at the same time, live, each in its own Boat sandbox.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/rd.css">
+<link rel="icon" type="image/png" href="/static/favicon.png">
+<link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+</head>
+<body class="is-landing">
+
+<header class="topbar">
+  <a class="brand" href="/" aria-label="Gondola home"><img src="/static/logo.png" alt="Gondola" width="139" height="22"></a>
+  <div class="runlabel" id="runlabel" aria-live="polite"><span id="rl-domain"></span><span class="muted" id="rl-runs"></span></div>
+  <button class="gridtoggle" id="gridtoggle" type="button" aria-label="Show all designs as a grid" aria-pressed="false"><i></i><i></i><i></i><i></i></button>
+</header>
+
+<!-- 1 · Landing -->
+<main class="landing" id="landing">
+  <form class="field" id="go" novalidate>
+    <label class="field-box" id="fieldbox">
+      <span class="prefix">https://</span>
+      <input id="url" name="url" type="text" inputmode="url" autocomplete="url" autocapitalize="off" spellcheck="false"
+             placeholder="yourdomain.com" aria-label="Your website's domain" aria-describedby="hint">
+      <button class="go" id="gobtn" type="submit" aria-label="Start"><span class="arrow">→</span><span class="spin"></span></button>
+    </label>
+  </form>
+  <div class="under">
+    <div class="hint" id="hint" role="alert"></div>
+    <div class="runsleft" id="runsleft"></div>
+  </div>
+  <a class="lastrun" id="lastrun" hidden></a>
+</main>
+
+<!-- 2 · Stage + gallery -->
+<section class="stage" id="stage" aria-label="Redesigns">
+  <div class="row" id="row" tabindex="0" aria-roledescription="carousel"><div class="track" id="track"></div></div>
+  <div class="below">
+    <div class="touchbar" id="touchbar"></div>
+    <div class="film" id="film" role="tablist" aria-label="All designs"></div>
+  </div>
+</section>
+
+<!-- Grid overview -->
+<section class="grid" id="grid" hidden aria-label="All designs"></section>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="/static/rd.js"></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+# secrets and local state
+.env
+*.dump
+tmp/
+archive/
+node_modules/
+.DS_Store

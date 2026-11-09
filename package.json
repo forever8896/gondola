@@ -1,0 +1,19 @@
+{
+  "name": "gondola",
+  "version": "0.1.0",
+  "description": "Enter a domain, watch 25 AI agents redesign the site in parallel, each in its own Boat sandbox.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "setup": "bash scripts/setup.sh",
+    "doctor": "bun scripts/doctor.ts",
+    "start": "bun src/server.ts",
+    "dev": "bun --watch src/server.ts",
+    "db": "docker compose up -d",
+    "prewarm": "bun scripts/prewarm.ts"
+  },
+  "engines": {
+    "bun": ">=1.3"
+  }
+}

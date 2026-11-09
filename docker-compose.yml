@@ -1,0 +1,21 @@
+# Postgres for Gondola. Credentials come from .env (created by `bun run setup`).
+name: gondola
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: gondola-db
+    environment:
+      POSTGRES_USER: gondola
+      POSTGRES_DB: gondola
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?run "bun run setup" first}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5544}:5432"   # localhost only
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gondola -d gondola"]
+      interval: 2s
+      retries: 30
+    restart: unless-stopped
+volumes:
+  pgdata:
