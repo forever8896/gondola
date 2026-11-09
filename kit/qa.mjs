@@ -95,6 +95,68 @@ const CHECK = `(async () => { ${HELPERS}
   return JSON.stringify(out);
 })()`;
 
+// Scroll the page top to bottom in steps and catch what only goes wrong while scrolling: titles running off the
+// screen, clipped by their container or spilling out of their section; sticky elements taller than the screen or
+// covering text; text that stays invisible after scrolling to it; sideways overflow mid-scroll.
+const SCROLL = `(async () => { ${HELPERS}
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  await document.fonts.ready;
+  const vw = innerWidth, vh = innerHeight, out = new Map();
+  const add = (k, m) => { if (!out.has(k)) out.set(k, m); };
+  const short = e => label(e).slice(0, 34);
+  const H = () => Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+  const stickies = [...document.querySelectorAll('body *')].filter(e => /sticky|fixed/.test(getComputedStyle(e).position));
+  const isHeader = (e, r) => r.top <= 2 && r.height < 140 && r.width > vw * 0.6;   // ordinary site header bar
+  const opacityOf = e => { let o = 1; for (let a = e; a && a !== document.documentElement; a = a.parentElement) { const s = getComputedStyle(a); o *= parseFloat(s.opacity); if (s.visibility === 'hidden') return 0; } return o; };
+  const steps = Math.min(14, Math.max(2, Math.ceil(H() / (vh * 0.75))));
+  for (let i = 0; i <= steps; i++) {
+    window.scrollTo(0, Math.round(i * Math.max(0, H() - vh) / steps));
+    await wait(450);
+    if (document.documentElement.scrollWidth > vw + 2) add('hscroll', 'the page becomes wider than the screen while scrolling (' + document.documentElement.scrollWidth + 'px at ' + vw + 'px)');
+    // titles
+    for (const h of [...document.querySelectorAll('h1,h2,h3,h4,[class*=title],[class*=heading],[class*=display]')].slice(0, 120)) {
+      const r = h.getBoundingClientRect(); if (!r.width || r.bottom < 0 || r.top > vh || !h.innerText?.trim()) continue;
+      const range = document.createRange(); range.selectNodeContents(h); const t = range.getBoundingClientRect();
+      if (t.right > vw + 4 || t.left < -4) add('edge:' + short(h), 'title "' + short(h) + '" runs off the screen edge');
+      for (let a = h.parentElement; a && a !== document.body; a = a.parentElement) {
+        const cs = getComputedStyle(a);
+        if (/hidden|clip/.test(cs.overflowX + ' ' + cs.overflowY)) {
+          const ar = a.getBoundingClientRect();
+          if (t.right > ar.right + 4 || t.left < ar.left - 4 || t.bottom > ar.bottom + 4) add('clip:' + short(h), 'title "' + short(h) + '" is cut off by its container (overflow hidden)');
+          break;
+        }
+      }
+      for (const p of [...(h.closest('section, article, header, footer') ?? document.body).querySelectorAll('p, li')].slice(0, 60)) {
+        if (h.contains(p) || p.contains(h) || !p.innerText?.trim()) continue;
+        const pr = p.getBoundingClientRect();
+        const ox = Math.min(t.right, pr.right) - Math.max(t.left, pr.left), oy = Math.min(t.bottom, pr.bottom) - Math.max(t.top, pr.top);
+        if (ox > 8 && oy > 8) { add('overlap:' + short(h), 'title "' + short(h) + '" overlaps the text "' + short(p) + '"'); break; }
+      }
+      const sec = h.closest('section, header, footer, article');
+      if (sec) { const sr = sec.getBoundingClientRect(); if (t.bottom > sr.bottom + 6 || t.right > sr.right + 6) add('spill:' + short(h), 'title "' + short(h) + '" spills outside its section into the next one'); }
+    }
+    // sticky / fixed elements
+    for (const st of stickies) {
+      const r = st.getBoundingClientRect(); if (!r.height || r.bottom < 0 || r.top > vh) continue;
+      if (isHeader(st, r)) continue;
+      if (getComputedStyle(st).position === 'sticky' && r.height > vh + 4) add('tall:' + short(st), 'a sticky element ("' + short(st) + '") is ' + Math.round(r.height) + 'px tall on a ' + vh + 'px screen, so its bottom can never be read');
+      for (const p of [...document.querySelectorAll('p, li, h2, h3')].slice(0, 200)) {
+        if (st.contains(p) || p.contains(st)) continue;
+        const pr = p.getBoundingClientRect(); if (!pr.width || pr.top < 0 || pr.bottom > vh || !p.innerText?.trim()) continue;
+        const hit = document.elementFromPoint(pr.left + pr.width / 2, pr.top + pr.height / 2);
+        if (hit && st.contains(hit)) { add('cover:' + short(st), 'a sticky/fixed element ("' + short(st) + '") covers text ("' + short(p) + '") while scrolling'); break; }
+      }
+    }
+    // text that never becomes visible
+    for (const e of [...document.querySelectorAll('h1,h2,h3,p,li')].slice(0, 160)) {
+      const r = e.getBoundingClientRect(); if (!r.width || r.top < 0 || r.bottom > vh || !e.innerText?.trim()) continue;
+      if (opacityOf(e) < 0.15) add('ghost:' + short(e), 'text "' + short(e) + '" is still invisible after scrolling to it (an entrance animation never finishes)');
+    }
+  }
+  window.scrollTo(0, 0);
+  return JSON.stringify([...out.values()].slice(0, 12));
+})()`;
+
 const PROFILE = `(async () => { ${HELPERS}
   await document.fonts.ready;
   const count = new Map(); const add = (k, w) => count.set(k, (count.get(k) || 0) + w);
@@ -126,6 +188,9 @@ try {
     const issues = [...new Set([...(d.value ?? []).map(x => 'desktop: ' + x), ...(m.value ?? []).map(x => 'mobile: ' + x),
       ...[...new Set([...d.errors, ...m.errors])].slice(0, 3).map(e => 'JavaScript error: ' + e)])];
     console.log(JSON.stringify(issues));
+  } else if (mode === 'scroll') {
+    const d = await inspect(1440, 900, SCROLL), m = await inspect(390, 844, SCROLL);
+    console.log(JSON.stringify([...new Set([...(d.value ?? []).map(x => 'desktop: ' + x), ...(m.value ?? []).map(x => 'mobile: ' + x)])]));
   } else if (mode === 'shot') {
     // Full-page capture for the scrolling grid: 1440 CSS px wide, saved at half scale as JPEG, height capped.
     const out = process.argv[4];

@@ -186,9 +186,14 @@ const shuffle = <T>(a: T[]) => { const b = [...a]; for (let i = b.length - 1; i 
  * Briefs in `exclude` (already used for this site) are skipped while enough others remain.
  */
 export function pickBriefs(n: number, exclude: Set<number> = new Set(), keep: any[] = []) {
-  const taken = new Set(keep.map(b => b.brief_id));
+  let taken = new Set(keep.map(b => b.brief_id));
   let pool = BRIEFS.filter(b => !exclude.has(b.brief_id) && !taken.has(b.brief_id));
-  if (pool.length < n - keep.length) pool = BRIEFS.filter(b => !taken.has(b.brief_id));
+  if (pool.length < n - keep.length) {
+    // Not enough unused directions left for this site: take every unused one, then repeat older ones.
+    keep = [...keep, ...shuffle(pool)];
+    taken = new Set(keep.map(b => b.brief_id));
+    pool = BRIEFS.filter(b => !taken.has(b.brief_id));
+  }
   const fams = new Map<string, any[]>();
   for (const b of shuffle(pool)) (fams.get(b.style_family) ?? fams.set(b.style_family, []).get(b.style_family)!).push(b);
   const usedFams = new Set(keep.map(b => b.style_family));
@@ -235,8 +240,12 @@ export async function curateBriefs(run: any, n: number, exclude: Set<number>): P
     return r ? new TextDecoder().decode(r.bytes) : '';
   };
   const content = (await kit('content.md')).slice(0, 7000), style = await kit('original-style.md');
-  let pool = BRIEFS.filter(b => !exclude.has(b.brief_id));
-  if (pool.length < n) pool = BRIEFS;
+  // Directions this site has never had always go in first; when there are fewer than n, the curator picks the rest
+  // from the ones it has had (they come back with a new palette and hero idea).
+  const fresh = BRIEFS.filter(b => !exclude.has(b.brief_id));
+  const mustInclude = fresh.length < n ? fresh : [];
+  const pool = fresh.length >= n ? fresh : BRIEFS.filter(b => exclude.has(b.brief_id));
+  const need = n - mustInclude.length;
   const library = shuffle(pool).map(b => `${b.brief_id} | ${b.style_family} | ${(b.directory_tags ?? []).map((t: string) => t.split(': ')[1]).join(', ')} | ${b.reference} | ${String(b.layout).slice(0, 100)}`).join('\n');
   const chat = async (prompt: string, maxTokens: number) => {
     if (SUBSCRIPTION) return parsePicks(await claudeLocal(prompt + '\nReply with the JSON object only, no prose, no code fences.'));
@@ -260,16 +269,18 @@ export async function curateBriefs(run: any, n: number, exclude: Set<number>): P
     `You are the creative director for a set of ${n} homepage redesigns of one person's or company's site. Each is built by a ` +
     `separate designer agent from one brief in the library. The bar is award-level work (Awwwards Site of the Day, Godly): ` +
     `striking, confident, memorable. Nothing safe, generic or template-like.\n\n` +
-    `Pick exactly ${n} brief ids. Rules: (1) no two picks from the same style family; (2) spread the set across dark/light, ` +
+    `Pick exactly ${need} brief ids. Rules: (1) no two picks from the same style family; (2) spread the set across dark/light, ` +
     `type-led/image-led, loud/precise, retro/futuristic, so it feels like ${n} different studios; (3) cover as many different ` +
     `award-directory style categories (the tags column, from Awwwards and SiteInspire) as possible; (4) favour directions that ` +
     `can be spectacular for THIS person's story; (5) nothing may resemble the current site.\n\n` +
+    (mustInclude.length ? `These ${mustInclude.length} are already in the set; complement them and avoid their families: ${mustInclude.map(b => b.style_family).join(', ')}.\n\n` : '') +
     context + `## Library (id | family | award-directory style tags | in the spirit of | layout)\n${library}\n\n` +
     `Output only JSON: {"picks": [{"id": <number>, "why": "<max 10 words>"}]}`;
   try {
     const byId = new Map(BRIEFS.map(b => [b.brief_id, b]));
-    const chosen: any[] = [], fams = new Set<string>();
-    for (const p of await chat(choose, 4000)) {
+    const chosen: any[] = mustInclude.map(b => ({ ...b, why: 'a direction this site has never had' }));
+    const fams = new Set<string>(chosen.map(b => b.style_family));
+    for (const p of need > 0 ? await chat(choose, 4000) : []) {
       const b = byId.get(Number(p?.id));
       if (!b || chosen.some(c => c.brief_id === b.brief_id) || fams.has(b.style_family)) continue;
       chosen.push({ ...b, why: clip(p.why, 120) });
@@ -560,6 +571,13 @@ const IMAGE_TREATMENTS = [
 const treatmentFor = (n: number, photos: number) =>
   photos === 0 ? 'The site has no usable photos: build the visuals from type, colour, rules and shapes.' : IMAGE_TREATMENTS[(n - 1) % IMAGE_TREATMENTS.length];
 
+/** The scroll test (kit/qa.mjs scroll) inside the sandbox; returns concrete issues (empty = clean). */
+async function scrollCheck(sb: string): Promise<string[]> {
+  const r = await exec(sb, 'node ~/.rd/qa.mjs scroll http://localhost:3001/ 2>/dev/null', 200);
+  for (const line of r.stdout.trim().split('\n').reverse()) try { const v = JSON.parse(line); if (Array.isArray(v)) return v.map(String).filter(i => !i.startsWith('QA checker error')).slice(0, 12); } catch {}
+  return [];
+}
+
 /** Run kit/qa.mjs inside the sandbox; returns concrete issues (empty = clean). */
 async function qaCheck(sb: string): Promise<string[]> {
   const r = await exec(sb, `cd ~/redesign; test -s design.json && python3 -c 'import json;json.load(open("design.json"))' 2>/dev/null || echo '["design.json is missing or invalid JSON: write it as described in AGENTS.md"]'; node ~/.rd/qa.mjs check http://localhost:3001/ 2>/dev/null`, 150);
@@ -655,7 +673,7 @@ async function buildDesign(run: any, base: string, d: any, photos: number, curat
     await sql`UPDATE designs SET tool_calls = ${calls} WHERE id = ${d.id}`;
 
     // 4. QA round: measure the page in a real browser inside the sandbox, one round of concrete fixes.
-    let qa: { before: string[]; after: string[] | null } = { before: [], after: null };
+    let qa: { before: string[]; after: string[] | null; scroll_before?: string[]; scroll_after?: string[] } = { before: [], after: null };
     if ((await exec(sb, 'test -s ~/redesign/index.html && echo OK')).stdout.includes('OK')) {
       await setDesign(d.id, { last_action: 'checking the page in a browser' });
       qa.before = await qaCheck(sb);
@@ -666,6 +684,21 @@ async function buildDesign(run: any, base: string, d: any, photos: number, curat
           `Fix them with targeted edits. Keep the design and the brief as they are; do not restart the page. Then stop.`,
           onAction, Date.now() + QA_FIX_MS);
         qa.after = await qaCheck(sb);
+      }
+      // 5. Scroll pass: scroll the page top to bottom (desktop and phone) and fix what only breaks while scrolling.
+      await setDesign(d.id, { last_action: 'checking how the page scrolls' });
+      qa.scroll_before = await scrollCheck(sb);
+      if (qa.scroll_before.length) {
+        await log(run.id, d.n, `scroll check found ${qa.scroll_before.length} issue${qa.scroll_before.length > 1 ? 's' : ''}, fixing`);
+        await agentTurn(run, d, sb,
+          `A scroll test of your page (scrolling it top to bottom at 1440px and at 390px wide) found these problems:\n` +
+          `${qa.scroll_before.map((i: string) => '- ' + i).join('\n')}\n` +
+          `Fix them with targeted edits, keeping the design: size titles with clamp() so they fit their column at every width and ` +
+          `let them wrap (overflow-wrap: anywhere; no fixed widths or white-space: nowrap on long titles); keep every title inside ` +
+          `its own section and off the body text; sticky or fixed elements must be shorter than the screen (max-height: 100dvh) ` +
+          `and must not cover text (or stop being sticky on small screens); every entrance animation must end visible. Then stop.`,
+          onAction, Date.now() + QA_FIX_MS);
+        qa.scroll_after = await scrollCheck(sb);
       }
       await sql`UPDATE designs SET qa = ${JSON.stringify(qa)}::text::jsonb, tool_calls = ${calls} WHERE id = ${d.id}`;
     }

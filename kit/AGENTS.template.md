@@ -61,6 +61,10 @@ template or a document. Checklist:
 - Must look complete and intentional at 1440×900 and at 390px wide (mobile). No horizontal scroll.
 - The first screen at 390×844 must show the name and the headline. No hero that is mostly empty space on mobile.
 - Body text at least 15px on mobile; contrast at least 4.5:1 (3:1 for 24px+ text), including grey "muted" text.
+- Scroll-safe: size titles with clamp() so they fit their column at every width, and let long titles wrap
+  (overflow-wrap: anywhere; never white-space: nowrap or fixed widths on them). A title never leaves its section and never
+  overlaps body text. Sticky or fixed elements are shorter than the screen and never cover text; on phones prefer no
+  sticky at all. A scroll test (desktop and 390px) runs after you finish and sends back anything that breaks.
 - All content must be VISIBLE WITHOUT JS and without scroll-triggered reveals (pages get screenshotted headless).
 - Avoid the default AI look: no purple/blue glow gradients, no centred-hero-over-mesh, no three identical
   feature cards, no glassmorphism unless the brief asks, no emoji as icons, and do not default to
