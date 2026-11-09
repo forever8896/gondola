@@ -101,6 +101,35 @@ The sweeper removes the prepared copy when it expires.
 - **Your runs** are tied to your browser. Open `/admin?token=<ADMIN_TOKEN>` once (token in `.env`) to see every
   run on the server.
 
+## Share pages
+
+Publish a finished run as a page anyone can open: the same grid and scroll view, every design as its own standalone
+page, Copy prompt on each one, Share on X / Copy link buttons, and a link preview made from that run's designs.
+Shares are static files on Cloudflare Pages (free), so nothing of yours has to stay online.
+
+One-time setup:
+
+```sh
+bunx wrangler login                                            # opens Cloudflare in your browser
+bunx wrangler pages project create gondola --production-branch main
+```
+
+Then add your domain to the project in the Cloudflare dashboard (Workers & Pages → gondola → Custom domains) and
+set `SHARE_ORIGIN` in `.env` to it (and `SHARE_PROJECT` if you named the project differently).
+
+```sh
+bun run share example.com           # publish the latest finished run for example.com, prints the link
+bun run share example.com --skip 3  # leave a design out
+bun run share list                  # what's published
+bun run share remove <slug>         # take one down
+bun run share deploy                # redeploy (e.g. after changing the landing page in site/)
+```
+
+Each share lives at `/s/<site>-<random>/`: unlisted (the address can't be guessed, and search engines are told not
+to index it), at the same address when you republish the run. A design's own page is `/s/<slug>/p/<n>/`. The deploy
+also carries the landing page from `site/`. Cloudflare Pages allows 20,000 files per site, about 60 shares of 50
+designs; `bun run share` warns before that. Design pages get the same restrictive content policy as in the app.
+
 ## Configuration
 
 Everything lives in `.env`; [`.env.example`](../.env.example) documents each setting. The usual ones:
@@ -124,7 +153,8 @@ Everything lives in `.env`; [`.env.example`](../.env.example) documents each set
 | `src/boat.ts` | `boat` CLI wrapper and start-rate limiter |
 | `kit/` | the agents' rules, 92 design briefs and their directory tags, the asset fetcher and the browser checks that run in sandboxes |
 | `public/` | the frontend (vanilla JS, no build step) |
-| `scripts/` | `setup`, `doctor`, `prewarm` |
+| `scripts/` | `setup`, `doctor`, `prewarm`, `share` (static share pages) |
+| `src/prompt.ts`, `src/embed.ts` | the Copy prompt text, and the auto-scroll helper injected into embedded pages |
 | `schema.sql` | the database, applied on every start |
 
 ## Troubleshooting

@@ -11,7 +11,8 @@
     "start": "bun src/server.ts",
     "dev": "bun --watch src/server.ts",
     "db": "docker compose up -d",
-    "prewarm": "bun scripts/prewarm.ts"
+    "prewarm": "bun scripts/prewarm.ts",
+    "share": "bun scripts/share.ts"
   },
   "engines": {
     "bun": ">=1.3"

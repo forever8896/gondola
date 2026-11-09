@@ -5,3 +5,5 @@ tmp/
 archive/
 node_modules/
 .DS_Store
+shares/
+.wrangler/

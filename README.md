@@ -56,6 +56,7 @@ the moment you press enter.
 ## Docs
 
 - [Guide](docs/GUIDE.md): requirements, costs and limits, how a run works, configuration, troubleshooting
+- [Share pages](docs/GUIDE.md#share-pages): publish a run as a page anyone can open, share and copy prompts from
 - [Access control](docs/ACCESS-CONTROL.md): read this before hosting Gondola for other people
 
 ## License

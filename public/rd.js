@@ -13,6 +13,8 @@ const body = document.body;
 
 // ---------------------------------------------------------------- state
 let me = null;                        // /api/me: last/active run, optional operator limit
+// A published share page sets window.GONDOLA_SHARE = { id, base }: a finished run served as static files.
+const SHARE = window.GONDOLA_SHARE || null;
 let runId = null, API = '', run = null, contentOrigin = '', queuePos = null, notFound = false;
 const designs = new Map();            // n → design (publicDesign)
 const cards = new Map();              // key ('o' | n) → card handle
@@ -113,8 +115,8 @@ form.addEventListener('submit', async e => {
 
 // ---------------------------------------------------------------- enter the run view
 function enterRun(id, animate, url) {
-  runId = id; API = `/api/runs/${id}`;
-  if (location.pathname !== '/r/' + id) history.pushState({ run: id }, '', '/r/' + id);
+  runId = id; API = SHARE ? `${SHARE.base}data` : `/api/runs/${id}`;
+  if (!SHARE && location.pathname !== '/r/' + id) history.pushState({ run: id }, '', '/r/' + id);
   if (!animate) { body.classList.add('no-anim'); }
   body.classList.remove('is-landing', 'is-empty');
   body.classList.add('is-run');
@@ -219,7 +221,7 @@ function queueCaption() {
   return 'Starting…';
 }
 const readingCaption = () => (run?.phase_note || 'reading your site').replace(/^extracting:\s*/i, '').replace(/\.$/, '');
-const designUrl = d => `${contentOrigin}/p/${d.token}/`;
+const designUrl = d => (SHARE ? `${SHARE.base}p/${d.n}/` : `${contentOrigin}/p/${d.token}/`);
 
 /** Paint one card from its data. Works for row cards and grid cards. */
 function paint(c) {
@@ -374,7 +376,7 @@ function mountIframes() {
       f.setAttribute('tabindex', '-1');
       f.setAttribute('aria-hidden', 'true');
       f.referrerPolicy = 'no-referrer';
-      f.src = designUrl(d) + '?embed=1';
+      f.src = designUrl(d) + (SHARE ? 'embed' : '?embed=1');
       f.onload = () => setTimeout(() => c.site.classList.add('live'), 250);
       c.site.append(f);
       c.iframe = f; c.ready = false;
@@ -513,7 +515,7 @@ function onCardClick(c) {
 async function copyPrompt(n, btn) {
   const label = 'Copy prompt';
   try {
-    const r = await fetch(`${API}/designs/${n}/prompt`);
+    const r = await fetch(`${API}/designs/${n}/prompt${SHARE ? '.txt' : ''}`);
     if (!r.ok) throw new Error();
     const text = await r.text();
     try { await navigator.clipboard.writeText(text); }
@@ -838,10 +840,10 @@ function upsertDesign(d) {
 
 // ---------------------------------------------------------------- data
 async function load() {
-  const r = await fetch(API);
+  const r = await fetch(SHARE ? `${API}/run.json` : API);
   if (!r.ok) { notFound = true; scheduleRender(); return false; }
   const j = await r.json();
-  run = j.run; contentOrigin = j.content_origin; queuePos = j.queue_position;
+  run = j.run; contentOrigin = SHARE ? location.origin : j.content_origin; queuePos = j.queue_position;
   for (const d of j.designs) upsertDesign(d);
   loadedOnce = true;
   tryOriginalShot();
@@ -850,6 +852,7 @@ async function load() {
 }
 
 async function start() {
+  if (SHARE) { await load(); return; }   // a share is a finished run: no session, no live stream
   loadMe();
   const ok = await load();
   if (!ok || ['done', 'failed'].includes(run.status)) return;
@@ -879,7 +882,8 @@ async function start() {
 
 // ---------------------------------------------------------------- boot
 const m = /^\/r\/([A-Za-z0-9_-]{22})$/.exec(location.pathname);
-if (m) enterRun(m[1], false);
+if (SHARE) enterRun(SHARE.id, false);
+else if (m) enterRun(m[1], false);
 else {
   loadMe();
   layout(); setTimeout(() => input.focus({ preventScroll: true }), 50);
