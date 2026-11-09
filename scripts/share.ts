@@ -6,7 +6,7 @@
 //   bun run share deploy                                            rebuild the landing page and redeploy everything
 //
 // Everything is built into shares/site/ (landing page at the root, shares under /s/<slug>/) and deployed with
-// `wrangler pages deploy` to the Cloudflare Pages project SHARE_PROJECT (default "gondola").
+// `wrangler deploy` as the static-assets Cloudflare Worker SHARE_PROJECT (default "gondola") on SHARE_ORIGIN's domain.
 import { sql, publicDesign, publicRun } from '../src/db';
 import { claudePrompt } from '../src/prompt';
 import { embedJs } from '../src/embed';
@@ -188,10 +188,19 @@ p{font-size:20px;line-height:1.38;color:#555;margin:0}
 async function deploy() {
   const count = async (d: string): Promise<number> => { let n = 0; for (const e of await readdir(d)) { const p = join(d, e); n += (await stat(p)).isDirectory() ? await count(p) : 1; } return n; };
   const files = await count(SITE);
-  if (files > 19_000) console.warn(`! ${files} files: Cloudflare Pages allows 20,000 per deployment. Remove old shares (bun run share remove <slug>).`);
-  const run = (args: string[]) => Bun.spawn(['bunx', 'wrangler', ...args], { cwd: OUT, stdout: 'inherit', stderr: 'inherit' })   // not the repo root: keep .env out of wrangler's sight.exited;
-  if (await run(['pages', 'deploy', SITE, '--project-name', PROJECT, '--branch', 'main', '--commit-dirty=true']) !== 0)
-    throw new Error(`deploy failed. First time? Run: bunx wrangler login, then bunx wrangler pages project create ${PROJECT} --production-branch main`);
+  if (files > 19_000) console.warn(`! ${files} files: Cloudflare allows 20,000 per site. Remove old shares (bun run share remove <slug>).`);
+  // A Cloudflare Worker that only serves the static folder (Cloudflare's successor to Pages). With SHARE_DOMAIN set,
+  // the deploy also attaches that domain; it must not have another DNS record (delete the old one first).
+  const domain = process.env.SHARE_DOMAIN ?? new URL(ORIGIN).hostname;
+  const config = {
+    name: PROJECT, compatibility_date: '2026-11-01', workers_dev: true,
+    assets: { directory: 'site', html_handling: 'auto-trailing-slash' },
+    ...(domain.endsWith('.workers.dev') ? {} : { routes: [{ pattern: domain, custom_domain: true }] }),
+  };
+  await writeFile(join(OUT, 'wrangler.json'), JSON.stringify(config, null, 2));
+  await rm(join(OUT, 'wrangler.jsonc'), { force: true });
+  const p = Bun.spawn(['bunx', 'wrangler', 'deploy'], { cwd: OUT, stdout: 'inherit', stderr: 'inherit' });   // not the repo root: keep .env out of wrangler's sight
+  if (await p.exited !== 0) throw new Error('deploy failed. First time? Run: bunx wrangler login');
 }
 
 // ---------------------------------------------------------------- cli
