@@ -232,7 +232,7 @@ export async function curateBriefs(run: any, n: number, exclude: Set<number>): P
   const content = (await kit('content.md')).slice(0, 7000), style = await kit('original-style.md');
   let pool = BRIEFS.filter(b => !exclude.has(b.brief_id));
   if (pool.length < n) pool = BRIEFS;
-  const library = shuffle(pool).map(b => `${b.brief_id} | ${b.style_family} | ${b.reference} | ${String(b.layout).slice(0, 110)}`).join('\n');
+  const library = shuffle(pool).map(b => `${b.brief_id} | ${b.style_family} | ${(b.directory_tags ?? []).map((t: string) => t.split(': ')[1]).join(', ')} | ${b.reference} | ${String(b.layout).slice(0, 100)}`).join('\n');
   const chat = async (prompt: string, maxTokens: number) => {
     const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -255,9 +255,10 @@ export async function curateBriefs(run: any, n: number, exclude: Set<number>): P
     `separate designer agent from one brief in the library. The bar is award-level work (Awwwards Site of the Day, Godly): ` +
     `striking, confident, memorable. Nothing safe, generic or template-like.\n\n` +
     `Pick exactly ${n} brief ids. Rules: (1) no two picks from the same style family; (2) spread the set across dark/light, ` +
-    `type-led/image-led, loud/precise, retro/futuristic, so it feels like ${n} different studios; (3) favour directions that ` +
-    `can be spectacular for THIS person's story; (4) nothing may resemble the current site.\n\n` +
-    context + `## Library (id | family | in the spirit of | layout)\n${library}\n\n` +
+    `type-led/image-led, loud/precise, retro/futuristic, so it feels like ${n} different studios; (3) cover as many different ` +
+    `award-directory style categories (the tags column, from Awwwards and SiteInspire) as possible; (4) favour directions that ` +
+    `can be spectacular for THIS person's story; (5) nothing may resemble the current site.\n\n` +
+    context + `## Library (id | family | award-directory style tags | in the spirit of | layout)\n${library}\n\n` +
     `Output only JSON: {"picks": [{"id": <number>, "why": "<max 10 words>"}]}`;
   try {
     const byId = new Map(BRIEFS.map(b => [b.brief_id, b]));

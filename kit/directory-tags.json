@@ -1,0 +1,25 @@
+{
+  "about": "Public style categories from award directories, used as labels for Gondola's design briefs (kit/briefs.json, field directory_tags). Only the published category names are used; no sites, screenshots or content from the directories.",
+  "fetched": "2026-11-09",
+  "sources": {
+    "Awwwards": {
+      "url": "https://www.awwwards.com/websites/",
+      "group": "Tag (style-related entries)",
+      "tags": ["3D", "Animation", "App Style", "Big Background Images", "Clean", "Colorful", "Copy design", "Data Visualization", "Filters and Effects",
+               "Flat Design", "Fullscreen", "Gallery", "Gestures / Interaction", "Graphic design", "Horizontal Layout", "Illustration", "Infinite Scroll",
+               "Interaction Design", "Microinteractions", "Minimal", "Parallax", "Photo & Video", "Photographic", "Retro", "Scrolling", "Single page",
+               "Storytelling", "Transitions", "Typography", "UI design", "Unusual Navigation", "Vector", "Video"],
+      "also": { "Category": ["Experimental", "Art & Illustration", "Web & Interactive"] }
+    },
+    "SiteInspire": {
+      "url": "https://www.siteinspire.com/websites",
+      "group": "Popular categories (style-related entries)",
+      "tags": ["Typographic", "Minimal", "Grid Layout", "Unusual Layout"]
+    }
+  },
+  "not_used": {
+    "Godly": "godly.website now redirects to recent.design, which only lists media types (Web, Interface, Motion, ...), not style tags",
+    "Land-book": "refuses automated requests (403); left out rather than worked around",
+    "CSS Design Awards": "refuses automated requests (403)"
+  }
+}

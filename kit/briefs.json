@@ -8,7 +8,11 @@
   "layout": "strict 12-column grid visible as hairlines, flush-left, asymmetric, numbered sections 01\u201306",
   "motion": "none",
   "density": "medium",
-  "hard_constraint": "no rounded corners anywhere; no cards; hero headline set across 3+ lines at 10vw"
+  "hard_constraint": "no rounded corners anywhere; no cards; hero headline set across 3+ lines at 10vw",
+  "directory_tags": [
+   "Awwwards: Typography",
+   "SiteInspire: Grid Layout"
+  ]
  },
  {
   "brief_id": 2,
@@ -19,7 +23,11 @@
   "layout": "wayfinding system: each section is a 'station'; the main list of work/achievements is a vertical line map with stops",
   "motion": "minimal - a line draws down the page on load",
   "density": "medium",
-  "hard_constraint": "the longest list on the page (projects, awards or timeline) must be rendered as a subway-line diagram"
+  "hard_constraint": "the longest list on the page (projects, awards or timeline) must be rendered as a subway-line diagram",
+  "directory_tags": [
+   "Awwwards: Unusual Navigation",
+   "Awwwards: Data Visualization"
+  ]
  },
  {
   "brief_id": 3,
@@ -30,7 +38,11 @@
   "layout": "chaotic stacked blocks with thick 4px black borders, overlapping, deliberate misalignment",
   "motion": "marquee strips of award names",
   "density": "high",
-  "hard_constraint": "no images in the hero; use type only. Images appear raw with borders lower down"
+  "hard_constraint": "no images in the hero; use type only. Images appear raw with borders lower down",
+  "directory_tags": [
+   "Awwwards: Typography",
+   "Awwwards: Experimental"
+  ]
  },
  {
   "brief_id": 4,
@@ -53,7 +65,11 @@
   "layout": "the page is a terminal session: hero is `$ whoami` output, sections are commands (`ls projects/`, `cat experience.log`)",
   "motion": "typed-out hero line via CSS steps(); blinking cursor",
   "density": "high",
-  "hard_constraint": "no rounded corners, no shadows; all content still readable as text, not images"
+  "hard_constraint": "no rounded corners, no shadows; all content still readable as text, not images",
+  "directory_tags": [
+   "Awwwards: Retro",
+   "Awwwards: Microinteractions"
+  ]
  },
  {
   "brief_id": 6,
@@ -64,7 +80,11 @@
   "layout": "left fixed sidebar with name + nav, content as a changelog feed with dates in mono on the left rail",
   "motion": "subtle fade on hover only",
   "density": "medium",
-  "hard_constraint": "all dated items (work, awards, posts) merged into one reverse-chronological changelog"
+  "hard_constraint": "all dated items (work, awards, posts) merged into one reverse-chronological changelog",
+  "directory_tags": [
+   "Awwwards: UI design",
+   "Awwwards: Clean"
+  ]
  },
  {
   "brief_id": 7,
@@ -75,7 +95,11 @@
   "layout": "long-form profile article: the intro becomes a feature story with drop cap, pull quotes taken verbatim from content, full-bleed hero photo",
   "motion": "none",
   "density": "low",
-  "hard_constraint": "written as a magazine feature; work items appear as captioned figures, not cards"
+  "hard_constraint": "written as a magazine feature; work items appear as captioned figures, not cards",
+  "directory_tags": [
+   "Awwwards: Typography",
+   "Awwwards: Photographic"
+  ]
  },
  {
   "brief_id": 8,
@@ -98,7 +122,12 @@
   "layout": "full-viewport sections, each dominated by one massive word taken from the section's own heading",
   "motion": "CSS scroll-driven animations (animation-timeline: view()) for type scaling, with visible fallback",
   "density": "low",
-  "hard_constraint": "the site's main headline must fill the first viewport edge to edge"
+  "hard_constraint": "the site's main headline must fill the first viewport edge to edge",
+  "directory_tags": [
+   "Awwwards: Typography",
+   "Awwwards: Animation",
+   "Awwwards: Scrolling"
+  ]
  },
  {
   "brief_id": 10,
@@ -109,7 +138,11 @@
   "layout": "type specimen sheet: name shown at many weights, sections labelled like specimen glyph tables",
   "motion": "variable-axis hover animation on headings",
   "density": "medium",
-  "hard_constraint": "no photos above the fold"
+  "hard_constraint": "no photos above the fold",
+  "directory_tags": [
+   "Awwwards: Typography",
+   "Awwwards: Interaction Design"
+  ]
  },
  {
   "brief_id": 11,
@@ -120,7 +153,11 @@
   "layout": "entire homepage is ONE dense bento grid of mixed-size tiles (2x2 hero photo, 1x1 stats, 2x1 projects...)",
   "motion": "tile lift on hover",
   "density": "high",
-  "hard_constraint": "everything above the fold must be a tile; no long scrolling sections until experience"
+  "hard_constraint": "everything above the fold must be a tile; no long scrolling sections until experience",
+  "directory_tags": [
+   "SiteInspire: Grid Layout",
+   "Awwwards: Clean"
+  ]
  },
  {
   "brief_id": 12,
@@ -131,7 +168,11 @@
   "layout": "dark bento with large rounded-24px tiles, video posters inside tiles, stats as huge numbers",
   "motion": "gentle gradient border on hover for tiles",
   "density": "high",
-  "hard_constraint": "the most impressive list (awards, clients, results) shown as a grid of medal-like tiles"
+  "hard_constraint": "the most impressive list (awards, clients, results) shown as a grid of medal-like tiles",
+  "directory_tags": [
+   "SiteInspire: Grid Layout",
+   "Awwwards: Microinteractions"
+  ]
  },
  {
   "brief_id": 13,
@@ -142,7 +183,11 @@
   "layout": "the page is a Windows-95 desktop: each section is a draggable-looking window with title bar and close buttons; taskbar at the bottom",
   "motion": "none or minimal",
   "density": "high",
-  "hard_constraint": "must still be fully readable and work on mobile (windows stack vertically)"
+  "hard_constraint": "must still be fully readable and work on mobile (windows stack vertically)",
+  "directory_tags": [
+   "Awwwards: Retro",
+   "Awwwards: Unusual Navigation"
+  ]
  },
  {
   "brief_id": 14,
@@ -153,7 +198,11 @@
   "layout": "centred floating panels with bevelled chrome frames, a 'loading bar' hero showing the site's strongest number or claim",
   "motion": "slow shimmer on chrome surfaces",
   "density": "medium",
-  "hard_constraint": "no flat design; every container has a bevel or chrome edge"
+  "hard_constraint": "no flat design; every container has a bevel or chrome edge",
+  "directory_tags": [
+   "Awwwards: Retro",
+   "Awwwards: 3D"
+  ]
  },
  {
   "brief_id": 15,
@@ -164,7 +213,11 @@
   "layout": "the homepage is a film: opening title card, sections as 'scenes' with scene numbers, closing credits as the footer listing roles",
   "motion": "slow cross-fades, letterbox bars",
   "density": "low",
-  "hard_constraint": "the people / roles / experience section must be presented as end credits"
+  "hard_constraint": "the people / roles / experience section must be presented as end credits",
+  "directory_tags": [
+   "Awwwards: Storytelling",
+   "Awwwards: Video"
+  ]
  },
  {
   "brief_id": 16,
@@ -175,7 +228,11 @@
   "layout": "work items laid out as a 35mm film contact sheet with sprocket holes and frame numbers",
   "motion": "none",
   "density": "high",
-  "hard_constraint": "all work images framed as film frames with edge codes"
+  "hard_constraint": "all work images framed as film frames with edge codes",
+  "directory_tags": [
+   "Awwwards: Photographic",
+   "Awwwards: Gallery"
+  ]
  },
  {
   "brief_id": 17,
@@ -186,7 +243,11 @@
   "layout": "broadsheet front page: masthead with date, lead story = hero, 5-column grid, the longest list as a results table",
   "motion": "none",
   "density": "high",
-  "hard_constraint": "must have a newspaper masthead and multi-column text"
+  "hard_constraint": "must have a newspaper masthead and multi-column text",
+  "directory_tags": [
+   "SiteInspire: Grid Layout",
+   "Awwwards: Typography"
+  ]
  },
  {
   "brief_id": 18,
@@ -209,7 +270,11 @@
   "layout": "chunky blocks with hard offset black shadows (6px 6px 0 #000), stickers rotated a few degrees",
   "motion": "buttons press down on hover",
   "density": "medium",
-  "hard_constraint": "every interactive element has a hard offset shadow"
+  "hard_constraint": "every interactive element has a hard offset shadow",
+  "directory_tags": [
+   "Awwwards: Colorful",
+   "Awwwards: Flat Design"
+  ]
  },
  {
   "brief_id": 20,
@@ -220,7 +285,11 @@
   "layout": "Memphis geometric shapes (squiggles, circles, triangles in CSS/SVG) scattered behind content, playful asymmetry",
   "motion": "shapes float slowly",
   "density": "medium",
-  "hard_constraint": "use CSS/SVG geometric decoration; no gradients"
+  "hard_constraint": "use CSS/SVG geometric decoration; no gradients",
+  "directory_tags": [
+   "Awwwards: Colorful",
+   "Awwwards: Illustration"
+  ]
  },
  {
   "brief_id": 21,
@@ -231,7 +300,11 @@
   "layout": "extreme whitespace, vertical section labels, content in narrow columns offset right",
   "motion": "none",
   "density": "very low",
-  "hard_constraint": "use vertical writing-mode for at least the section headings"
+  "hard_constraint": "use vertical writing-mode for at least the section headings",
+  "directory_tags": [
+   "SiteInspire: Minimal",
+   "Awwwards: Typography"
+  ]
  },
  {
   "brief_id": 22,
@@ -242,7 +315,11 @@
   "layout": "lookbook: full-bleed grayscale images, projects as 'looks' numbered LOOK 01..04, minimal captions",
   "motion": "slow image zoom on hover",
   "density": "very low",
-  "hard_constraint": "all images grayscale; no colour anywhere"
+  "hard_constraint": "all images grayscale; no colour anywhere",
+  "directory_tags": [
+   "Awwwards: Photographic",
+   "Awwwards: Big Background Images"
+  ]
  },
  {
   "brief_id": 23,
@@ -253,7 +330,11 @@
   "layout": "collage: photos taped at angles (CSS tape), torn-paper edges, handwritten arrows to highlights",
   "motion": "none",
   "density": "high",
-  "hard_constraint": "images must be rotated/taped, never in a neat grid"
+  "hard_constraint": "images must be rotated/taped, never in a neat grid",
+  "directory_tags": [
+   "Awwwards: Graphic design",
+   "SiteInspire: Unusual Layout"
+  ]
  },
  {
   "brief_id": 24,
@@ -264,7 +345,11 @@
   "layout": "a trading-terminal dashboard: ticker tape of highlights, panels with every number the content contains, the longest list as a results table",
   "motion": "ticker tape scroll",
   "density": "very high",
-  "hard_constraint": "every number from content.md shown as a stat; nothing invented"
+  "hard_constraint": "every number from content.md shown as a stat; nothing invented",
+  "directory_tags": [
+   "Awwwards: Data Visualization",
+   "Awwwards: Infinite Scroll"
+  ]
  },
  {
   "brief_id": 25,
@@ -275,7 +360,11 @@
   "layout": "character sheet: name + class (the person's or company's role), stats panel, inventory = work, achievements unlocked = awards/milestones, quest log = history",
   "motion": "achievement 'unlock' pop on load (ending visible)",
   "density": "high",
-  "hard_constraint": "achievements with trophy tiers; keep all text factual"
+  "hard_constraint": "achievements with trophy tiers; keep all text factual",
+  "directory_tags": [
+   "Awwwards: Retro",
+   "Awwwards: Gestures / Interaction"
+  ]
  },
  {
   "brief_id": 26,
@@ -286,7 +375,11 @@
   "layout": "composition of circles, squares and triangles in CSS around an asymmetric grid",
   "motion": "none",
   "density": "medium",
-  "hard_constraint": "section dividers and markers are primitive shapes; every heading lowercase"
+  "hard_constraint": "section dividers and markers are primitive shapes; every heading lowercase",
+  "directory_tags": [
+   "Awwwards: Graphic design",
+   "Awwwards: Flat Design"
+  ]
  },
  {
   "brief_id": 27,
@@ -297,7 +390,11 @@
   "layout": "symmetrical, centred columns framed by stepped ornamental borders and sunburst motifs drawn in CSS",
   "motion": "slow shimmer on gold rules",
   "density": "medium",
-  "hard_constraint": "every section framed by a stepped Deco border; sunburst behind the hero"
+  "hard_constraint": "every section framed by a stepped Deco border; sunburst behind the hero",
+  "directory_tags": [
+   "Awwwards: Graphic design",
+   "Awwwards: Retro"
+  ]
  },
  {
   "brief_id": 28,
@@ -320,7 +417,11 @@
   "layout": "the person presented like a product launch: claim, logo strip of organisations named in the content, feature grid for work, changelog for history",
   "motion": "subtle hover lifts",
   "density": "medium",
-  "hard_constraint": "structured like product marketing, but every claim is a fact from content.md; no pricing, no fake metrics"
+  "hard_constraint": "structured like product marketing, but every claim is a fact from content.md; no pricing, no fake metrics",
+  "directory_tags": [
+   "Awwwards: UI design",
+   "Awwwards: Clean"
+  ]
  },
  {
   "brief_id": 30,
@@ -331,7 +432,11 @@
   "layout": "a drawing sheet: faint grid, dimension lines, callouts pointing at items, a title block bottom-right",
   "motion": "lines draw in on load (ending visible)",
   "density": "medium",
-  "hard_constraint": "a title block with name, location and sheet number; dimension lines as decoration"
+  "hard_constraint": "a title block with name, location and sheet number; dimension lines as decoration",
+  "directory_tags": [
+   "SiteInspire: Unusual Layout",
+   "Awwwards: Data Visualization"
+  ]
  },
  {
   "brief_id": 31,
@@ -342,7 +447,11 @@
   "layout": "diagonal bands at 12-15 degrees, giant arrows and wedges, type set on angles",
   "motion": "none",
   "density": "medium",
-  "hard_constraint": "at least two sections set on a diagonal; one giant arrow in the hero"
+  "hard_constraint": "at least two sections set on a diagonal; one giant arrow in the hero",
+  "directory_tags": [
+   "Awwwards: Graphic design",
+   "SiteInspire: Unusual Layout"
+  ]
  },
  {
   "brief_id": 32,
@@ -353,7 +462,11 @@
   "layout": "flowing wavy section edges (SVG), rounded blobs, warm stacked colour bands",
   "motion": "gentle wave drift",
   "density": "medium",
-  "hard_constraint": "every section boundary is a wave; no straight horizontal dividers"
+  "hard_constraint": "every section boundary is a wave; no straight horizontal dividers",
+  "directory_tags": [
+   "Awwwards: Retro",
+   "Awwwards: Colorful"
+  ]
  },
  {
   "brief_id": 33,
@@ -364,7 +477,11 @@
   "layout": "cut-paper shapes (clip-path) holding images and headings, playful offsets",
   "motion": "none",
   "density": "medium",
-  "hard_constraint": "images framed by irregular cut-paper shapes; no rectangles for media"
+  "hard_constraint": "images framed by irregular cut-paper shapes; no rectangles for media",
+  "directory_tags": [
+   "Awwwards: Retro",
+   "Awwwards: Illustration"
+  ]
  },
  {
   "brief_id": 34,
@@ -387,7 +504,11 @@
   "layout": "the page is one long narrow receipt centred on a grey desk: dashed separators, line items, perforated edges, CSS barcode",
   "motion": "receipt slides in from the top (ending visible)",
   "density": "high",
-  "hard_constraint": "everything inside one receipt; work and history as line items"
+  "hard_constraint": "everything inside one receipt; work and history as line items",
+  "directory_tags": [
+   "SiteInspire: Unusual Layout",
+   "Awwwards: Copy design"
+  ]
  },
  {
   "brief_id": 36,
@@ -398,7 +519,11 @@
   "layout": "contour-line SVG backdrop, a map legend box, sections labelled with grid coordinates",
   "motion": "none",
   "density": "medium",
-  "hard_constraint": "a legend box and coordinate labels (A1, B2...) for every section"
+  "hard_constraint": "a legend box and coordinate labels (A1, B2...) for every section",
+  "directory_tags": [
+   "SiteInspire: Unusual Layout",
+   "Awwwards: Vector"
+  ]
  },
  {
   "brief_id": 37,
@@ -421,7 +546,11 @@
   "layout": "dark street-sign panels, headings as neon signs, body text on solid dark panels",
   "motion": "neon flicker once on load",
   "density": "medium",
-  "hard_constraint": "glow (text-shadow) only on headings; body text plain and high-contrast"
+  "hard_constraint": "glow (text-shadow) only on headings; body text plain and high-contrast",
+  "directory_tags": [
+   "Awwwards: Filters and Effects",
+   "Awwwards: Typography"
+  ]
  },
  {
   "brief_id": 39,
@@ -468,7 +597,11 @@
   "layout": "comic panels with gutters, captions in boxes, quotes from content in speech bubbles, halftone dots (radial-gradient)",
   "motion": "panel pop-in (ending visible)",
   "density": "high",
-  "hard_constraint": "thick black panel borders and halftone backgrounds; speech bubbles only for real quotes"
+  "hard_constraint": "thick black panel borders and halftone backgrounds; speech bubbles only for real quotes",
+  "directory_tags": [
+   "Awwwards: Illustration",
+   "Awwwards: Storytelling"
+  ]
  },
  {
   "brief_id": 43,
@@ -503,7 +636,11 @@
   "layout": "the homepage is an index table of work: rows with year, type, title; images reveal on hover",
   "motion": "row hover reveals image",
   "density": "high",
-  "hard_constraint": "the main content is a table-like index of rows"
+  "hard_constraint": "the main content is a table-like index of rows",
+  "directory_tags": [
+   "SiteInspire: Grid Layout",
+   "SiteInspire: Minimal"
+  ]
  },
  {
   "brief_id": 46,
@@ -514,7 +651,11 @@
   "layout": "sunset gradient sky over a CSS perspective grid floor; content in solid readable panels",
   "motion": "slow grid scroll",
   "density": "medium",
-  "hard_constraint": "a CSS perspective grid; all body text on solid panels"
+  "hard_constraint": "a CSS perspective grid; all body text on solid panels",
+  "directory_tags": [
+   "Awwwards: Retro",
+   "Awwwards: Filters and Effects"
+  ]
  },
  {
   "brief_id": 47,
@@ -525,7 +666,11 @@
   "layout": "dialog boxes with stepped pixel borders (box-shadow), menu cursor arrows",
   "motion": "blinking menu cursor",
   "density": "high",
-  "hard_constraint": "pixel borders only; no rounded corners, no gradients"
+  "hard_constraint": "pixel borders only; no rounded corners, no gradients",
+  "directory_tags": [
+   "Awwwards: Retro",
+   "Awwwards: Gestures / Interaction"
+  ]
  },
  {
   "brief_id": 48,
@@ -536,7 +681,11 @@
   "layout": "angled section cuts, scoreboard panels for real numbers, oversized italic headlines",
   "motion": "quick slide-ins (ending visible)",
   "density": "medium",
-  "hard_constraint": "numbers shown in scoreboard panels; angled cuts between sections"
+  "hard_constraint": "numbers shown in scoreboard panels; angled cuts between sections",
+  "directory_tags": [
+   "Awwwards: Data Visualization",
+   "Awwwards: Transitions"
+  ]
  },
  {
   "brief_id": 49,
@@ -559,7 +708,11 @@
   "layout": "full-bleed solid colour sections with huge numerals and short text",
   "motion": "none",
   "density": "low",
-  "hard_constraint": "every section a different solid colour field with accessible text contrast"
+  "hard_constraint": "every section a different solid colour field with accessible text contrast",
+  "directory_tags": [
+   "Awwwards: Colorful",
+   "Awwwards: Fullscreen"
+  ]
  },
  {
   "brief_id": 51,
@@ -570,7 +723,11 @@
   "layout": "frosted glass cards over a soft aurora gradient backdrop",
   "motion": "slow aurora drift",
   "density": "medium",
-  "hard_constraint": "backdrop-filter glass with a solid fallback; contrast stays readable on every card"
+  "hard_constraint": "backdrop-filter glass with a solid fallback; contrast stays readable on every card",
+  "directory_tags": [
+   "Awwwards: Filters and Effects",
+   "Awwwards: 3D"
+  ]
  },
  {
   "brief_id": 52,
@@ -605,7 +762,11 @@
   "layout": "rough hand-drawn boxes and arrows (SVG), highlighter marks under key words",
   "motion": "none",
   "density": "medium",
-  "hard_constraint": "hand-drawn borders; body text stays in a clean readable font"
+  "hard_constraint": "hand-drawn borders; body text stays in a clean readable font",
+  "directory_tags": [
+   "Awwwards: Illustration",
+   "Awwwards: Vector"
+  ]
  },
  {
   "brief_id": 55,
@@ -616,7 +777,11 @@
   "layout": "flat tiles and oversized lowercase section titles running off the edge, panorama feel",
   "motion": "tile flip on hover",
   "density": "medium",
-  "hard_constraint": "lowercase oversized titles; flat tiles, no shadows, no rounding"
+  "hard_constraint": "lowercase oversized titles; flat tiles, no shadows, no rounding",
+  "directory_tags": [
+   "Awwwards: Flat Design",
+   "Awwwards: Horizontal Layout"
+  ]
  },
  {
   "brief_id": 56,
@@ -627,7 +792,11 @@
   "layout": "an anchor-desk hero, lower-third captions for each section, a breaking ticker of real highlights",
   "motion": "ticker scroll",
   "density": "high",
-  "hard_constraint": "each section has a lower-third caption; ticker items only from content"
+  "hard_constraint": "each section has a lower-third caption; ticker items only from content",
+  "directory_tags": [
+   "Awwwards: Video",
+   "Awwwards: Transitions"
+  ]
  },
  {
   "brief_id": 57,
@@ -650,7 +819,11 @@
   "layout": "work and history as rows on a departures board: destination, role, status, year",
   "motion": "flaps settle on load (ending visible)",
   "density": "high",
-  "hard_constraint": "a split-flap board as the main content"
+  "hard_constraint": "a split-flap board as the main content",
+  "directory_tags": [
+   "SiteInspire: Unusual Layout",
+   "Awwwards: Microinteractions"
+  ]
  },
  {
   "brief_id": 59,
@@ -661,7 +834,11 @@
   "layout": "work shown as a card spread with roman numerals I, II, III and engraved-style frames",
   "motion": "card turn on hover",
   "density": "medium",
-  "hard_constraint": "a card spread with roman numerals; no mystical claims about the person"
+  "hard_constraint": "a card spread with roman numerals; no mystical claims about the person",
+  "directory_tags": [
+   "Awwwards: Illustration",
+   "Awwwards: Gallery"
+  ]
  },
  {
   "brief_id": 60,
@@ -672,7 +849,11 @@
   "layout": "soft inflated cards with inner and outer shadows, chunky rounded buttons",
   "motion": "squish on press",
   "density": "medium",
-  "hard_constraint": "clay depth on cards and buttons; body text on flat surfaces"
+  "hard_constraint": "clay depth on cards and buttons; body text on flat surfaces",
+  "directory_tags": [
+   "Awwwards: 3D",
+   "Awwwards: Microinteractions"
+  ]
  },
  {
   "brief_id": 61,
@@ -695,7 +876,11 @@
   "layout": "the first screen is a magazine cover: masthead, cover photo or type, coverlines taken from content",
   "motion": "none",
   "density": "medium",
-  "hard_constraint": "first screen is a framed magazine cover; coverlines only from content.md"
+  "hard_constraint": "first screen is a framed magazine cover; coverlines only from content.md",
+  "directory_tags": [
+   "Awwwards: Typography",
+   "Awwwards: Photographic"
+  ]
  },
  {
   "brief_id": 63,
@@ -706,7 +891,11 @@
   "layout": "layers offset by a few pixels in red and cyan, scanline bands, sliced headline fragments shifted sideways",
   "motion": "a short glitch burst on load, ending clean",
   "density": "medium",
-  "hard_constraint": "the headline is rendered with an RGB-split effect; body text stays clean and readable"
+  "hard_constraint": "the headline is rendered with an RGB-split effect; body text stays clean and readable",
+  "directory_tags": [
+   "Awwwards: Filters and Effects",
+   "Awwwards: Experimental"
+  ]
  },
  {
   "brief_id": 64,
@@ -717,7 +906,11 @@
   "layout": "layered type at different angles and sizes, overlapping screens of colour, letterspaced fragments",
   "motion": "none",
   "density": "high",
-  "hard_constraint": "at least three type sizes overlap in the hero; no plain left-aligned stack"
+  "hard_constraint": "at least three type sizes overlap in the hero; no plain left-aligned stack",
+  "directory_tags": [
+   "Awwwards: Typography",
+   "Awwwards: Experimental"
+  ]
  },
  {
   "brief_id": 65,
@@ -728,7 +921,11 @@
   "layout": "framed print panels with seal stamps, wave and cloud motifs drawn in SVG, vertical cartouches for titles",
   "motion": "waves drift slowly",
   "density": "medium",
-  "hard_constraint": "each section is a framed print with a red seal; titles in vertical cartouches"
+  "hard_constraint": "each section is a framed print with a red seal; titles in vertical cartouches",
+  "directory_tags": [
+   "Awwwards: Illustration",
+   "Awwwards: Vector"
+  ]
  },
  {
   "brief_id": 66,
@@ -739,7 +936,11 @@
   "layout": "glossy pill buttons, glass panels with highlights, bubbles and lens flares over a sky gradient",
   "motion": "bubbles float up slowly",
   "density": "medium",
-  "hard_constraint": "every button and panel has a glossy top highlight; the hero sits on a sky gradient"
+  "hard_constraint": "every button and panel has a glossy top highlight; the hero sits on a sky gradient",
+  "directory_tags": [
+   "Awwwards: Retro",
+   "Awwwards: 3D"
+  ]
  },
  {
   "brief_id": 67,
@@ -750,7 +951,11 @@
   "layout": "the whole page is a Mondrian composition: thick black rules divide rectangles, some filled with primary colour, content sits inside the white cells",
   "motion": "none",
   "density": "medium",
-  "hard_constraint": "thick black grid lines frame every block; only the three primaries as fills"
+  "hard_constraint": "thick black grid lines frame every block; only the three primaries as fills",
+  "directory_tags": [
+   "SiteInspire: Grid Layout",
+   "Awwwards: Flat Design"
+  ]
  },
  {
   "brief_id": 68,
@@ -761,7 +966,11 @@
   "layout": "everything framed with box-drawing characters (\u2554\u2550\u2557), an ASCII-art name banner, menus like a BBS",
   "motion": "blinking cursor only",
   "density": "high",
-  "hard_constraint": "the name is drawn as ASCII art; all frames use box-drawing characters"
+  "hard_constraint": "the name is drawn as ASCII art; all frames use box-drawing characters",
+  "directory_tags": [
+   "Awwwards: Retro",
+   "Awwwards: Typography"
+  ]
  },
  {
   "brief_id": 69,
@@ -772,7 +981,11 @@
   "layout": "boomerang and starburst shapes, orbit rings around the hero, rounded capsule panels",
   "motion": "orbits rotate slowly",
   "density": "medium",
-  "hard_constraint": "an orbit or starburst composition behind the hero"
+  "hard_constraint": "an orbit or starburst composition behind the hero",
+  "directory_tags": [
+   "Awwwards: Retro",
+   "Awwwards: Parallax"
+  ]
  },
  {
   "brief_id": 70,
@@ -783,7 +996,11 @@
   "layout": "a standards manual: numbered spreads, specimen boxes, grid diagrams, red worm-style logotype",
   "motion": "none",
   "density": "medium",
-  "hard_constraint": "laid out as a design manual with numbered spreads and diagram captions"
+  "hard_constraint": "laid out as a design manual with numbered spreads and diagram captions",
+  "directory_tags": [
+   "SiteInspire: Grid Layout",
+   "Awwwards: Graphic design"
+  ]
  },
  {
   "brief_id": 71,
@@ -794,7 +1011,11 @@
   "layout": "rounded stickers, speech bubbles, star and heart shapes, chunky outlined cards",
   "motion": "gentle bounce on hover",
   "density": "high",
-  "hard_constraint": "rounded sticker shapes everywhere; no sharp corners"
+  "hard_constraint": "rounded sticker shapes everywhere; no sharp corners",
+  "directory_tags": [
+   "Awwwards: Colorful",
+   "Awwwards: Illustration"
+  ]
  },
  {
   "brief_id": 72,
@@ -805,7 +1026,11 @@
   "layout": "centred playbill stack: many typefaces and sizes per line, ornamental rules, 'NOW SHOWING' style headers",
   "motion": "none",
   "density": "high",
-  "hard_constraint": "the hero is a playbill: at least four typefaces stacked in one centred column"
+  "hard_constraint": "the hero is a playbill: at least four typefaces stacked in one centred column",
+  "directory_tags": [
+   "Awwwards: Typography",
+   "Awwwards: Retro"
+  ]
  },
  {
   "brief_id": 73,
@@ -816,7 +1041,11 @@
   "layout": "sections as folded paper planes with creases (clip-path and gradients), dashed fold lines and arrows",
   "motion": "panels unfold on load (ending visible)",
   "density": "medium",
-  "hard_constraint": "every panel shows a crease or fold; diagram-style dashed lines and arrows"
+  "hard_constraint": "every panel shows a crease or fold; diagram-style dashed lines and arrows",
+  "directory_tags": [
+   "Awwwards: Vector",
+   "Awwwards: Transitions"
+  ]
  },
  {
   "brief_id": 74,
@@ -827,6 +1056,281 @@
   "layout": "dense flyer layout: warped headline, smiley and chrome shapes, line-up style list of work",
   "motion": "slow hue drift on the chrome",
   "density": "high",
-  "hard_constraint": "the hero is a rave flyer with a line-up style list; all claims from content"
+  "hard_constraint": "the hero is a rave flyer with a line-up style list; all claims from content",
+  "directory_tags": [
+   "Awwwards: Colorful",
+   "Awwwards: Experimental"
+  ]
+ },
+ {
+  "brief_id": 75,
+  "style_family": "horizontal-journey",
+  "directory_tags": [
+   "Awwwards: Horizontal Layout",
+   "Awwwards: Scrolling"
+  ],
+  "reference": "award-winning horizontal-scroll portfolios",
+  "palette": "ink #111, paper #f4f4f0, one electric accent #ff4d00",
+  "typography": "'Clash Display'-like 'Bricolage Grotesque' 800 + 'Inter Tight' (named on purpose)",
+  "layout": "the main story runs sideways: a horizontal rail of full-height panels (CSS scroll-snap on desktop), each panel one chapter; on mobile the panels stack vertically",
+  "motion": "panels snap; a progress bar tracks the rail",
+  "density": "low",
+  "hard_constraint": "a horizontally scrolling rail of panels on desktop; every panel readable without JS"
+ },
+ {
+  "brief_id": 76,
+  "style_family": "storytelling-chapters",
+  "directory_tags": [
+   "Awwwards: Storytelling",
+   "Awwwards: Scrolling"
+  ],
+  "reference": "scrollytelling features (NYT, The Pudding)",
+  "palette": "deep night #0e1116, warm white #f2efe8, signal red #e63946",
+  "typography": "'Fraunces' banned; use 'Newsreader' display + 'IBM Plex Sans'",
+  "layout": "the person's story told as numbered chapters with one big sentence each, facts revealed as the reader scrolls (CSS scroll-driven, with a visible fallback)",
+  "motion": "scroll-driven reveals ending visible",
+  "density": "low",
+  "hard_constraint": "structured as chapters (Chapter 1, 2, 3\u2026) built only from content.md facts"
+ },
+ {
+  "brief_id": 77,
+  "style_family": "parallax-depth",
+  "directory_tags": [
+   "Awwwards: Parallax",
+   "Awwwards: 3D"
+  ],
+  "reference": "layered parallax landscapes",
+  "palette": "dusk gradient #1b1f3b to #ff7a59, cream #fff4e0 type, teal #2ec4b6",
+  "typography": "'Unbounded' + 'DM Sans'",
+  "layout": "three to five depth layers (shapes, type, image) that move at different speeds with CSS perspective; content sits on a stable front layer",
+  "motion": "pure-CSS parallax (perspective + translateZ)",
+  "density": "medium",
+  "hard_constraint": "a multi-layer parallax hero; body text never moves under the reader"
+ },
+ {
+  "brief_id": 78,
+  "style_family": "data-visualization",
+  "directory_tags": [
+   "Awwwards: Data Visualization",
+   "Awwwards: Clean"
+  ],
+  "reference": "data-journalism graphics, FT and Bloomberg charts",
+  "palette": "white, ink #1a1a1a, chart palette #0072b2 #e69f00 #009e73 #d55e00",
+  "typography": "'IBM Plex Sans Condensed' + 'IBM Plex Mono' figures",
+  "layout": "every number in content.md becomes a chart: bars, timelines, a dot matrix; labels in mono",
+  "motion": "charts draw in once (ending visible)",
+  "density": "high",
+  "hard_constraint": "at least three inline SVG charts built only from numbers in content.md; nothing invented"
+ },
+ {
+  "brief_id": 79,
+  "style_family": "unusual-navigation",
+  "directory_tags": [
+   "Awwwards: Unusual Navigation",
+   "SiteInspire: Unusual Layout"
+  ],
+  "reference": "experimental navigation patterns",
+  "palette": "black #0a0a0a, white, acid green #c6ff00",
+  "typography": "'Syne' 700 + 'Space Mono'",
+  "layout": "navigation is the hero: a giant index of the sections as huge type, each line a link that expands its section in place (details/summary)",
+  "motion": "hover reveals and expands",
+  "density": "medium",
+  "hard_constraint": "the first screen is a full-screen typographic index of the page's sections"
+ },
+ {
+  "brief_id": 80,
+  "style_family": "micro-interactions",
+  "directory_tags": [
+   "Awwwards: Microinteractions",
+   "Awwwards: Interaction Design"
+  ],
+  "reference": "product sites known for tactile hover details",
+  "palette": "soft grey #eceef1, ink #15171c, blue #3b5bfd, mint #31d0aa",
+  "typography": "'Manrope' + 'JetBrains Mono'",
+  "layout": "cards and buttons with tactile states: magnetic hover, press depth, copy-to-clipboard email chip, tooltips",
+  "motion": "rich hover/focus/active states everywhere",
+  "density": "medium",
+  "hard_constraint": "every interactive element has distinct hover, focus and active states"
+ },
+ {
+  "brief_id": 81,
+  "style_family": "filters-and-effects",
+  "directory_tags": [
+   "Awwwards: Filters and Effects",
+   "Awwwards: Photographic"
+  ],
+  "reference": "duotone campaigns and grain-heavy editorial",
+  "palette": "duotone pair #ff2e63 + #08d9d6 over black, off-white #f5f5f5 text",
+  "typography": "'Archivo Black' + 'Archivo'",
+  "layout": "images treated with CSS filters and blend modes (duotone, grain overlay, halftone), big type knocked out over colour",
+  "motion": "subtle grain shimmer",
+  "density": "medium",
+  "hard_constraint": "every image gets a duotone or blend-mode treatment; text never sits on an untreated photo"
+ },
+ {
+  "brief_id": 82,
+  "style_family": "fullscreen-statements",
+  "directory_tags": [
+   "Awwwards: Fullscreen",
+   "Awwwards: Big Background Images"
+  ],
+  "reference": "full-viewport statement sites",
+  "palette": "each section one full-bleed colour or image field: cobalt #0038ff, cream #fff6e5, black",
+  "typography": "'Anton' + 'Inter Tight' (named on purpose)",
+  "layout": "every section is exactly one viewport tall with one statement and one supporting line; images full-bleed when used",
+  "motion": "sections snap (scroll-snap), no other motion",
+  "density": "very low",
+  "hard_constraint": "each section is one full viewport with a single statement"
+ },
+ {
+  "brief_id": 83,
+  "style_family": "infinite-gallery",
+  "directory_tags": [
+   "Awwwards: Infinite Scroll",
+   "Awwwards: Gallery"
+  ],
+  "reference": "endless marquee galleries",
+  "palette": "black #000, white, highlight #ffe600",
+  "typography": "'Monument Extended'-like 'Unbounded' + 'Inter Tight' (named on purpose)",
+  "layout": "work shown as endlessly looping marquees of cards and big words in rows moving in opposite directions; pause on hover",
+  "motion": "CSS marquees, paused under prefers-reduced-motion",
+  "density": "high",
+  "hard_constraint": "at least two opposite-direction marquee rows of work; all items also listed statically below"
+ },
+ {
+  "brief_id": 84,
+  "style_family": "experimental-collage",
+  "directory_tags": [
+   "Awwwards: Experimental",
+   "SiteInspire: Unusual Layout"
+  ],
+  "reference": "Awwwards experimental category winners",
+  "palette": "clashing #ff3c00, #0022ff, #f5f5dc, #111",
+  "typography": "mixed: 'Rubik Mono One', 'Instrument Sans', 'Courier Prime' (one each, with intent)",
+  "layout": "rule-breaking composition: overlapping layers, rotated blocks, text on paths, elements bleeding off the edge, still readable",
+  "motion": "drifting elements (ending in place)",
+  "density": "high",
+  "hard_constraint": "nothing aligns to a single grid, yet every text block stays readable"
+ },
+ {
+  "brief_id": 85,
+  "style_family": "typographic-poster",
+  "directory_tags": [
+   "Awwwards: Typography",
+   "SiteInspire: Typographic"
+  ],
+  "reference": "Awwwards Typography Honors",
+  "palette": "white #ffffff, black #000, one red #ff1f1f",
+  "typography": "one display family only ('Big Shoulders Display' 900) + 'Inter' for body (named on purpose)",
+  "layout": "the page is a series of type posters: words cropped by the viewport, stacked, rotated 90\u00b0, outlined and filled",
+  "motion": "none or one entrance per poster",
+  "density": "low",
+  "hard_constraint": "no images above the fold; type alone carries the design"
+ },
+ {
+  "brief_id": 86,
+  "style_family": "flat-vector",
+  "directory_tags": [
+   "Awwwards: Flat Design",
+   "Awwwards: Vector"
+  ],
+  "reference": "flat vector illustration systems",
+  "palette": "sky #7ed6df, sun #f9ca24, grass #6ab04c, coral #eb4d4b, navy #130f40",
+  "typography": "'Poppins' 600 + 'Nunito Sans'",
+  "layout": "scenes built from flat SVG shapes (no gradients, no shadows): the hero is a simple vector scene that illustrates a fact from content",
+  "motion": "gentle shape bobbing",
+  "density": "medium",
+  "hard_constraint": "all decoration is flat inline SVG; no gradients or shadows"
+ },
+ {
+  "brief_id": 87,
+  "style_family": "masonry-grid",
+  "directory_tags": [
+   "SiteInspire: Grid Layout",
+   "Awwwards: Gallery"
+  ],
+  "reference": "masonry portfolios and Pinterest-style boards",
+  "palette": "paper #f7f7f5, ink #121212, accent #ff6b35",
+  "typography": "'Satoshi'-like 'Outfit' + 'Inter Tight' (named on purpose)",
+  "layout": "a masonry grid of mixed-height cards (CSS columns) holding work, quotes, stats and images",
+  "motion": "cards lift on hover",
+  "density": "high",
+  "hard_constraint": "the main content is a masonry grid of mixed-height cards"
+ },
+ {
+  "brief_id": 88,
+  "style_family": "colorful-maximal",
+  "directory_tags": [
+   "Awwwards: Colorful",
+   "Awwwards: Graphic design"
+  ],
+  "reference": "maximalist colour-blocking campaigns",
+  "palette": "#ff006e, #fb5607, #ffbe0b, #3a86ff, #8338ec allowed here",
+  "typography": "'Bagel Fat One' + 'Space Grotesk'",
+  "layout": "every block a different saturated colour with high-contrast type; stickers, stars and badges between blocks",
+  "motion": "bouncy entrances (ending visible)",
+  "density": "high",
+  "hard_constraint": "at least five saturated colours across the page, each block one colour, text contrast still 4.5:1"
+ },
+ {
+  "brief_id": 89,
+  "style_family": "single-page-app",
+  "directory_tags": [
+   "Awwwards: App Style",
+   "Awwwards: Single page",
+   "Awwwards: UI design"
+  ],
+  "reference": "app-like portfolios with tabs and panels",
+  "palette": "dark #0f1115 panels, #e6e6e6 text, accent #7cff6b",
+  "typography": "'Geist' + 'Geist Mono'",
+  "layout": "the page behaves like an app: sticky sidebar, tabbed panels (radio-button tabs in CSS) for work, history and contact, status chips",
+  "motion": "panel transitions",
+  "density": "high",
+  "hard_constraint": "an app shell with CSS-only tabs; every panel's content also readable without interaction"
+ },
+ {
+  "brief_id": 90,
+  "style_family": "video-led",
+  "directory_tags": [
+   "Awwwards: Video",
+   "Awwwards: Photo & Video"
+  ],
+  "reference": "video-first agency reels",
+  "palette": "black #000, white, accent #ff3b30",
+  "typography": "'Neue Haas'-like 'Inter Tight' 800 + 'Inter' (named on purpose)",
+  "layout": "the hero and work items lead with the site's own videos (muted loop) or their posters, with captions as subtitles",
+  "motion": "video only; no other motion",
+  "density": "medium",
+  "hard_constraint": "use real videos from assets if present, otherwise posters; captions styled like subtitles"
+ },
+ {
+  "brief_id": 91,
+  "style_family": "retro-flat-illustration",
+  "directory_tags": [
+   "Awwwards: Retro",
+   "Awwwards: Illustration"
+  ],
+  "reference": "retro travel posters and WPA prints",
+  "palette": "sand #f2e3c6, rust #c1440e, teal #1e6f73, mustard #e8a33d, ink #2b2118",
+  "typography": "'Alfa Slab One' + 'Libre Franklin'",
+  "layout": "poster panels with flat retro illustration in SVG (sun rays, hills, simple icons), slab-serif headlines",
+  "motion": "none",
+  "density": "medium",
+  "hard_constraint": "each section is a framed poster panel with an SVG illustration"
+ },
+ {
+  "brief_id": 92,
+  "style_family": "transitions-wipes",
+  "directory_tags": [
+   "Awwwards: Transitions",
+   "Awwwards: Animation"
+  ],
+  "reference": "sites known for slick section transitions",
+  "palette": "violet is banned; use #111 and #f0f0f0 with lime #b8ff00 wipes",
+  "typography": "'Syne' 800 + 'Inter Tight' (named on purpose)",
+  "layout": "sections enter with clip-path wipes and masked text lines, like a film's scene changes",
+  "motion": "clip-path wipes that end in a visible state",
+  "density": "medium",
+  "hard_constraint": "every section has an entrance transition; all content visible without JS and with reduced motion"
  }
 ]

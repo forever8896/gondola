@@ -19,8 +19,10 @@
 
 1. **Read.** One sandbox opens your site and copies every word, image and colour.
 2. **Fork.** [Boat](https://boat.dev) forks that sandbox 50 times in about a minute.
-3. **Direct.** A curator gives each fork its own art direction: Swiss poster, split-flap board, Hokusai print,
-   rave flyer… with a wild palette and a hero idea built from your real content.
+3. **Direct.** Each fork gets its own art direction from 76 showpiece styles tagged with the public style
+   categories of [Awwwards](https://www.awwwards.com/websites/) and [SiteInspire](https://www.siteinspire.com/)
+   (Horizontal Layout, Storytelling, Typographic, Data Visualization…). Every run spreads across as many categories
+   as it can, and each style gets a wild palette and a hero idea built from your real content.
 4. **Build.** 50 agents design at once. You watch every page appear live in a grid that fits one screen.
 5. **Keep.** Finished pages are saved to your own server and the sandboxes are deleted. Copy any design as a
    Claude Code prompt that restyles your whole site in that direction.

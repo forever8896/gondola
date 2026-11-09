@@ -18,6 +18,22 @@ re-checks at any time, including your Boat plan limits and your OpenRouter balan
 The agents run inside Boat sandboxes and get their model key from your Boat AI profile. `setup` offers to store
 it there; otherwise run `boat ai profile set-key default openrouter-api-key`.
 
+## Where the design directions come from
+
+Every direction is a hand-written brief in [`kit/briefs.json`](../kit/briefs.json): a style family, a reference
+it is *in the spirit of* (a design movement, a designer, a publication or a product, never a site to copy), a
+palette, type, layout, motion, density and one hard rule that pushes it away from the safe default.
+
+Each showpiece brief is tagged with the **public style categories of award directories** it embodies: Awwwards
+tags (Typography, Horizontal Layout, Storytelling, Data Visualization, Unusual Navigation, Parallax, Filters and
+Effects, …) and SiteInspire categories (Typographic, Grid Layout, Unusual Layout, Minimal). The taxonomy, its
+sources and the date it was read are in [`kit/directory-tags.json`](../kit/directory-tags.json). Only the
+category names are used; nothing from the listed sites themselves.
+
+For each run, the curator picks briefs with no style family twice and **as many different directory categories
+as possible** (a 50-design run typically covers 30+ of the 37), then writes each pick a wild palette and a hero
+idea from the site's real content.
+
 ## Costs and limits
 
 Measured on real runs with the default models:
@@ -38,9 +54,9 @@ raises the limits for a small per-start fee; raise `STARTS_PER_*` to match.
    images are downloaded and described by a vision model (size, aspect ratio, text printed in them); the current
    look is measured (colours, fonts, layout) so the designs can steer away from it.
 2. **Fork.** The base is snapshotted and forked once per design, so every designer starts with the site in place.
-3. **Curate.** While the forks start, a curator model picks that many of the showpiece directions in
-   `kit/briefs.json` (Swiss International, split-flap departure boards, Hokusai woodblock, rave flyers, …), no two
-   from the same family, and writes each one a wild palette and a hero idea built from the site's real facts.
+3. **Curate.** While the forks start, a curator model picks that many of the showpiece directions (see
+   [above](#where-the-design-directions-come-from)), no two from the same family and spread across as many
+   award-directory categories as possible, and writes each one a wild palette and a hero idea from the site's facts.
 4. **Build.** Each agent follows `kit/AGENTS.template.md` (facts verbatim, the brief, image rules, an award-level
    bar), then gets an elevate pass. A browser check inside the sandbox (`kit/qa.mjs`) catches crops, contrast,
    unstyled pages and mobile problems for one round of fixes.
@@ -86,7 +102,7 @@ Everything lives in `.env`; [`.env.example`](../.env.example) documents each set
 | `src/pipeline.ts` | the worker: queue, read, prewarm, curator, fork, agent turns, QA, capture, cleanup sweeper |
 | `src/access.ts` | who may start a run (one at a time per browser, optional daily cap) |
 | `src/boat.ts` | `boat` CLI wrapper and start-rate limiter |
-| `kit/` | the agents' rules, 74 design briefs, the asset fetcher and the browser checks that run in sandboxes |
+| `kit/` | the agents' rules, 92 design briefs and their directory tags, the asset fetcher and the browser checks that run in sandboxes |
 | `public/` | the frontend (vanilla JS, no build step) |
 | `scripts/` | `setup`, `doctor`, `prewarm` |
 | `schema.sql` | the database, applied on every start |
