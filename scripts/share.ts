@@ -51,7 +51,8 @@ async function buildRoot() {
   await mkdir(join(SITE, 'static'), { recursive: true });
   for (const f of ['rd.js', 'rd.css', 'logo.png', 'favicon.png', 'apple-touch-icon.png']) await cp(join(ROOT, 'public', f), join(SITE, 'static', f));
   await writeFile(join(SITE, '_headers'), [
-    '/s/*', '  X-Robots-Tag: noindex', '  Referrer-Policy: no-referrer', '',
+    // No X-Robots-Tag header here: on images it stops X from showing the link preview. Pages say noindex in a meta tag.
+    '/s/*', '  Referrer-Policy: no-referrer', '',
     '/s/:slug/p/*', `  Content-Security-Policy: ${PAGE_CSP}`, '  X-Content-Type-Options: nosniff', '',
   ].join('\n'));
   // Design pages load images from assets/ next to them; one copy per share serves all of its designs.
@@ -104,7 +105,7 @@ async function publish(arg: string, skip: number[]) {
         const tag = `<script>${embedJs(null)}</script>`;
         await put(join(dir, 'p', String(d.n), 'embed.html'), /<\/body>/i.test(html) ? html.replace(/<\/body>(?![\s\S]*<\/body>)/i, tag + '</body>') : html + tag);
         // The standalone page gets a link preview of its own.
-        const og = [`<meta property="og:title" content="${esc(title)}">`, `<meta property="og:description" content="Made by Gondola: 50 AI designers redesign a site at once.">`,
+        const og = [`<meta name="robots" content="noindex">`, `<meta property="og:title" content="${esc(title)}">`, `<meta property="og:description" content="Made by Gondola: 50 AI designers redesign a site at once.">`,
           `<meta property="og:image" content="${ORIGIN}${base}data/designs/${d.n}/desktop.png">`, `<meta name="twitter:card" content="summary_large_image">`,
           `<meta name="twitter:title" content="${esc(title)}">`, `<meta name="twitter:description" content="Made by Gondola: 50 AI designers redesign a site at once.">`,
           `<meta name="twitter:image" content="${ORIGIN}${base}data/designs/${d.n}/desktop.png">`].join('');
